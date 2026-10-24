@@ -48,7 +48,7 @@ const errText = e => e?.message || 'Database operation failed';
 
 function requireAdmin(req, res, next) { if (!req.session.admin) return res.status(401).json({ error: 'Admin login required' }); next(); }
 function requireSuper(req, res, next) { if (!req.session.admin || req.session.admin.role !== 'super') return res.status(403).json({ error: 'Super admin access required' }); next(); }
-function requireWorker(req, res, next) { if (!req.session.worker) return res.status(401).json({ error: 'Worker login required' }); next(); }
+function requireWorker(req, res, next) { if (!req.worker) return res.status(401).json({ error: 'Worker login required' }); next(); }
 function publicAdmin(a) { return { id: a.id, username: a.username, name: a.name, email: a.email, role: a.role, status: a.status, createdAt: a.created_at }; }
 function publicMember(m) { return { id: m.id, name: m.name, eid: m.eid, dept: m.dept }; }
 function status(checkIn, checkOut) { return !checkIn ? 'Not checked in' : checkIn && !checkOut ? 'Working' : 'Checked out'; }
@@ -139,7 +139,8 @@ function dayStatus({ checkIn, mark, onLeave, date }) {
   if (mark === 'compoff') return 'Comp-off';
   if (mark === 'absent') return 'Absent';
   if (onLeave) return 'Leave';
-  return isSunday(date) ? 'Sunday off' : 'Absent';
+  if (isSunday(date)) return 'Sunday off';
+  return date >= ymd() ? 'Waiting response' : 'Absent'; // today is still open: becomes Absent only from the next day
 }
 async function eidTaken(eid, exceptId) {
   const { data, error } = await db.from('members').select('id,eid');
@@ -150,6 +151,26 @@ async function eidTaken(eid, exceptId) {
 async function logActivity(actorType, actorId, action, memberId = null, details = {}) {
   await db.from('activity_logs').insert({ actor_type: actorType, actor_id: actorId, action, member_id: memberId, details });
 }
+
+
+// ---------- Admin who is also a worker ("Link admin member") ----------
+// The link is stored in the settings table (key adminMember:<adminId> -> member id), so no SQL migration is needed.
+const LINK_PREFIX = 'adminMember:';
+async function linkedMemberFor(adminId) {
+  const mid = await setting(LINK_PREFIX + adminId, null);
+  if (!mid) return null;
+  const { data, error } = await db.from('members').select('id,name,eid,dept').eq('id', mid).maybeSingle();
+  if (error) throw error;
+  return data || null; // member deleted -> link is ignored
+}
+// req.worker = a logged-in worker, or an admin acting through the member linked to their account.
+app.use('/api', async (req, res, next) => {
+  req.worker = req.session.worker || null;
+  if (!req.worker && req.session.admin && /^\/(worker\/(?!auth|ids)|attendance\/[^/]+\/manual)/.test(req.path)) {
+    try { const m = await linkedMemberFor(req.session.admin.id); if (m) req.worker = { id: m.id, name: m.name, eid: m.eid, dept: m.dept }; } catch {}
+  }
+  next();
+});
 
 app.get('/health', (req, res) => res.status(200).json({ ok: true, service: 'jai-maruthi-attendance' }));
 
@@ -371,6 +392,55 @@ app.post('/api/worker/auth', workerLoginLimiter, async (req, res) => {
   } catch (e) { res.status(500).json({ error: errText(e) }); }
 });
 
+
+// Worker login screen: list of Worker IDs so the worker can pick one (PIN is still required).
+app.get('/api/worker/ids', async (req, res) => {
+  try {
+    const { data, error } = await db.from('members').select('eid').order('eid');
+    if (error) throw error;
+    const ids = [...new Set((data || []).map(x => String(x.eid || '').trim()).filter(Boolean))];
+    res.json({ ids });
+  } catch (e) { res.status(500).json({ error: errText(e) }); }
+});
+
+// Admin dashboard > Link admin member
+app.get('/api/admin/link-member', requireAdmin, async (req, res) => {
+  try {
+    const [{ data: members, error }, linked, { data: links }] = await Promise.all([
+      db.from('members').select('id,name,eid,dept').order('name'),
+      linkedMemberFor(req.session.admin.id),
+      db.from('settings').select('key,value').like('key', LINK_PREFIX + '%')
+    ]);
+    if (error) throw error;
+    const takenBy = {}; (links || []).forEach(l => { takenBy[l.value] = l.key.slice(LINK_PREFIX.length); });
+    res.json({
+      linked: linked ? publicMember(linked) : null,
+      members: (members || []).map(m => ({ ...publicMember(m), linkedToOther: !!takenBy[m.id] && takenBy[m.id] !== req.session.admin.id }))
+    });
+  } catch (e) { res.status(500).json({ error: errText(e) }); }
+});
+app.post('/api/admin/link-member', requireAdmin, async (req, res) => {
+  try {
+    const memberId = String(req.body.memberId || '');
+    const { data: m, error } = await db.from('members').select('id,name,eid,dept').eq('id', memberId).maybeSingle();
+    if (error) throw error;
+    if (!m) return res.status(404).json({ error: 'Member not found' });
+    const { data: links } = await db.from('settings').select('key,value').like('key', LINK_PREFIX + '%');
+    if ((links || []).some(l => l.value === m.id && l.key !== LINK_PREFIX + req.session.admin.id)) return res.status(400).json({ error: 'This member is already linked to another admin' });
+    await setSetting(LINK_PREFIX + req.session.admin.id, m.id);
+    await logActivity('admin', req.session.admin.id, 'admin_linked_member', m.id);
+    res.json({ linked: publicMember(m) });
+  } catch (e) { res.status(500).json({ error: errText(e) }); }
+});
+app.delete('/api/admin/link-member', requireAdmin, async (req, res) => {
+  try {
+    const { error } = await db.from('settings').delete().eq('key', LINK_PREFIX + req.session.admin.id);
+    if (error) throw error;
+    await logActivity('admin', req.session.admin.id, 'admin_unlinked_member');
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: errText(e) }); }
+});
+
 async function adminAttendance(req, res, type) {
   try {
     const date = ymd(), r = await getOneAttendance(req.params.id, date);
@@ -383,13 +453,13 @@ async function adminAttendance(req, res, type) {
 }
 async function workerAttendance(req, res, type) {
   try {
-    const date = ymd(), r = await getOneAttendance(req.session.worker.id, date);
+    const date = ymd(), r = await getOneAttendance(req.worker.id, date);
     if (type === 'checkIn' && r?.check_in) return res.status(400).json({ error: 'Already checked in' });
-    if (type === 'checkIn' && await approvedLeaveOn(req.session.worker.id, date)) return res.status(403).json({ error: ON_LEAVE_MSG });
-    if (type === 'checkIn') { const mk = await markOn(req.session.worker.id, date); if (mk) return res.status(403).json({ error: `You are marked ${MARK_LABEL[mk]} today. Contact your admin.` }); }
+    if (type === 'checkIn' && await approvedLeaveOn(req.worker.id, date)) return res.status(403).json({ error: ON_LEAVE_MSG });
+    if (type === 'checkIn') { const mk = await markOn(req.worker.id, date); if (mk) return res.status(403).json({ error: `You are marked ${MARK_LABEL[mk]} today. Contact your admin.` }); }
     if (type === 'checkOut' && !r?.check_in) return res.status(400).json({ error: 'Check in first' });
     if (type === 'checkOut' && r?.check_out) return res.status(400).json({ error: 'Already checked out' });
-    await setAttendance(req.session.worker.id, date, type, nowHM(), false); await logActivity('worker', req.session.worker.id, type === 'checkIn' ? 'worker_check_in' : 'worker_check_out', req.session.worker.id); res.json({ ok: true });
+    await setAttendance(req.worker.id, date, type, nowHM(), false); await logActivity('worker', req.worker.id, type === 'checkIn' ? 'worker_check_in' : 'worker_check_out', req.worker.id); res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: errText(e) }); }
 }
 app.post('/api/attendance/:id/check-in', requireAdmin, (req, res) => adminAttendance(req, res, 'checkIn'));
@@ -399,7 +469,7 @@ app.post('/api/worker/check-in', requireWorker, (req, res) => workerAttendance(r
 // The day is only counted as present once an admin approves the log.
 app.post('/api/worker/check-out', requireWorker, async (req, res) => {
   try {
-    const memberId = req.session.worker.id, date = ymd();
+    const memberId = req.worker.id, date = ymd();
     const r = await getOneAttendance(memberId, date);
     if (!r?.check_in) return res.status(400).json({ error: 'Check in first' });
     if (r.check_out) return res.status(400).json({ error: 'Already checked out' });
@@ -423,7 +493,7 @@ app.post('/api/worker/check-out', requireWorker, async (req, res) => {
 
 app.post('/api/attendance/:id/manual', requireWorker, async (req, res) => {
   try {
-    if (req.session.worker.id !== req.params.id) return res.status(403).json({ error: 'You can edit only your attendance' });
+    if (req.worker.id !== req.params.id) return res.status(403).json({ error: 'You can edit only your attendance' });
     const { type, date, time } = req.body;
     if (!['checkIn', 'checkOut'].includes(type) || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(time)) return res.status(400).json({ error: 'Invalid date or time' });
     const { data: m, error } = await db.from('members').select('*').eq('id', req.params.id).maybeSingle(); if (error) throw error;
@@ -437,7 +507,7 @@ app.post('/api/attendance/:id/manual', requireWorker, async (req, res) => {
 
 // ---------- Daily log (worker request -> admin approval -> unlocks check-out) ----------
 app.get('/api/worker/daily-log', requireWorker, async (req, res) => {
-  try { res.json({ log: publicLog(await getTodayLog(req.session.worker.id, ymd())) }); }
+  try { res.json({ log: publicLog(await getTodayLog(req.worker.id, ymd())) }); }
   catch (e) { res.status(500).json({ error: errText(e) }); }
 });
 app.post('/api/worker/daily-log', requireWorker, async (req, res) => {
@@ -445,7 +515,7 @@ app.post('/api/worker/daily-log', requireWorker, async (req, res) => {
     const task = String(req.body.task || '').trim();
     if (task.length < 3) return res.status(400).json({ error: 'Please describe your task (at least 3 characters)' });
     if (task.length > 1000) return res.status(400).json({ error: 'Daily log is too long (max 1000 characters)' });
-    const date = ymd(), memberId = req.session.worker.id;
+    const date = ymd(), memberId = req.worker.id;
     const att = await getOneAttendance(memberId, date);
     if (!att?.check_in) return res.status(400).json({ error: 'Check in first, then send your daily log' });
     const existing = await getTodayLog(memberId, date);
@@ -485,9 +555,9 @@ app.patch('/api/admin/daily-logs/:id', requireAdmin, async (req, res) => {
 // ---------- Leave (worker request -> admin approval) ----------
 app.get('/api/worker/leaves', requireWorker, async (req, res) => {
   try {
-    const { data, error } = await db.from('leave_requests').select('*').eq('member_id', req.session.worker.id).order('created_at', { ascending: false }).limit(30);
+    const { data, error } = await db.from('leave_requests').select('*').eq('member_id', req.worker.id).order('created_at', { ascending: false }).limit(30);
     if (error) throw error;
-    res.json({ leaves: (data || []).map(publicLeave), onLeaveToday: await approvedLeaveOn(req.session.worker.id, ymd()), markToday: await markOn(req.session.worker.id, ymd()) });
+    res.json({ leaves: (data || []).map(publicLeave), onLeaveToday: await approvedLeaveOn(req.worker.id, ymd()), markToday: await markOn(req.worker.id, ymd()) });
   } catch (e) { res.status(500).json({ error: errText(e) }); }
 });
 app.post('/api/worker/leaves', requireWorker, async (req, res) => {
@@ -503,21 +573,21 @@ app.post('/api/worker/leaves', requireWorker, async (req, res) => {
     if (dayDiff(fromDate, toDate) > 59) return res.status(400).json({ error: 'A single leave request can cover at most 60 days' });
     if (reason.length < 3) return res.status(400).json({ error: 'Please enter a reason for your leave' });
     if (reason.length > 500) return res.status(400).json({ error: 'Reason is too long (max 500 characters)' });
-    const { data: clash, error: ce } = await db.from('leave_requests').select('id').eq('member_id', req.session.worker.id).in('status', ['pending', 'approved']).lte('from_date', toDate).gte('to_date', fromDate).limit(1);
+    const { data: clash, error: ce } = await db.from('leave_requests').select('id').eq('member_id', req.worker.id).in('status', ['pending', 'approved']).lte('from_date', toDate).gte('to_date', fromDate).limit(1);
     if (ce) throw ce;
     if (clash && clash.length) return res.status(400).json({ error: 'You already have a pending or approved leave overlapping these dates' });
-    const { data, error } = await db.from('leave_requests').insert({ member_id: req.session.worker.id, from_date: fromDate, to_date: toDate, leave_type: leaveType, reason }).select('*').single();
+    const { data, error } = await db.from('leave_requests').insert({ member_id: req.worker.id, from_date: fromDate, to_date: toDate, leave_type: leaveType, reason }).select('*').single();
     if (error) throw error;
-    await logActivity('worker', req.session.worker.id, 'leave_requested', req.session.worker.id, { fromDate, toDate, leaveType });
+    await logActivity('worker', req.worker.id, 'leave_requested', req.worker.id, { fromDate, toDate, leaveType });
     res.json({ leave: publicLeave(data) });
   } catch (e) { res.status(500).json({ error: errText(e) }); }
 });
 app.delete('/api/worker/leaves/:id', requireWorker, async (req, res) => {
   try {
-    const { data, error } = await db.from('leave_requests').delete().eq('id', req.params.id).eq('member_id', req.session.worker.id).eq('status', 'pending').select('id').maybeSingle();
+    const { data, error } = await db.from('leave_requests').delete().eq('id', req.params.id).eq('member_id', req.worker.id).eq('status', 'pending').select('id').maybeSingle();
     if (error) throw error;
     if (!data) return res.status(404).json({ error: 'Pending request not found' });
-    await logActivity('worker', req.session.worker.id, 'leave_cancelled', req.session.worker.id, {});
+    await logActivity('worker', req.worker.id, 'leave_cancelled', req.worker.id, {});
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: errText(e) }); }
 });
@@ -611,7 +681,8 @@ app.get('/api/admin/attendance-log', requireAdmin, async (req, res) => {
         else if (lv) c = lv.leave_type === 'emergency' ? 'EL' : 'PL';
         else if (a?.check_in) c = 'W'; // worker's own entry still waiting for admin approval
         else if (ds < today && ds >= since && dow !== 0) c = 'A'; // no check-in on a past working day (Mon-Sat) = Absent automatically
-        if (c) totals[c]++;
+        else if (ds === today && ds >= since && dow !== 0) c = 'WR'; // today, nothing yet = waiting for response (turns Absent tomorrow)
+        if (c && c !== 'WR') totals[c]++;
         days.push(c);
       }
       return { id: m.id, name: m.name, eid: m.eid, dept: m.dept, days, totals };
@@ -692,9 +763,9 @@ app.get('/api/worker/history', requireWorker, async (req, res) => {
   try {
     const days = Math.min(Math.max(parseInt(req.query.days || 14, 10), 1), 365);
     const since = ymd(new Date(Date.now() - days * 86400000));
-    const { data, error } = await db.from('attendance').select('date,check_in,check_out,counted').eq('member_id', req.session.worker.id).gte('date', since).order('date', { ascending: false }); if (error) throw error;
-    const logs = await logMapFrom(since, req.session.worker.id);
-    res.json({ rows: (data || []).map(x => { const lg = logs[req.session.worker.id + '|' + x.date]; return { date: x.date, checkIn: x.check_in, checkOut: x.check_out, counted: x.counted !== false, task: lg?.status === 'denied' ? '' : (lg?.task || ''), logStatus: lg?.status || '' }; }) });
+    const { data, error } = await db.from('attendance').select('date,check_in,check_out,counted').eq('member_id', req.worker.id).gte('date', since).order('date', { ascending: false }); if (error) throw error;
+    const logs = await logMapFrom(since, req.worker.id);
+    res.json({ rows: (data || []).map(x => { const lg = logs[req.worker.id + '|' + x.date]; return { date: x.date, checkIn: x.check_in, checkOut: x.check_out, counted: x.counted !== false, task: lg?.status === 'denied' ? '' : (lg?.task || ''), logStatus: lg?.status || '' }; }) });
   } catch (e) { res.status(500).json({ error: errText(e) }); }
 });
 // ---------- Settings > All data (read-only browse + CSV, loaded one table at a time) ----------
