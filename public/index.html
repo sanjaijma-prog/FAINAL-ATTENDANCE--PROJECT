@@ -262,18 +262,12 @@
   .cal-cell.working{ background:#FFF3B0; }
   .cal-cell.absent{ background:var(--red-bg); }
   .cal-cell.compoff{ background:var(--accent-bg); }
-<<<<<<< HEAD
   .cal-cell.sitework{ background:#DBEAFE; }
-=======
->>>>>>> 40886b68476e5c3ce7826109068ac0efd20390fa
   .cal-cell.leave{ background:#FFF1CC; }
   .cal-tag{ display:inline-block; font-weight:700; font-size:10px; padding:1px 5px; border-radius:6px; }
   .cal-tag.absent{ background:var(--red); color:#fff; }
   .cal-tag.compoff{ background:var(--accent-dark); color:#fff; }
-<<<<<<< HEAD
   .cal-tag.sitework{ background:#1D4ED8; color:#fff; }
-=======
->>>>>>> 40886b68476e5c3ce7826109068ac0efd20390fa
   .cal-tag.leave{ background:#E0A100; color:#fff; }
   .cal-tag.ot{ background:var(--accent-dark); color:#fff; }
   .cal-nolog{ color:var(--red); font-weight:600; }
@@ -310,12 +304,8 @@
 
   .status-dot.absent{ background:var(--red-bg); color:var(--red); }
   .status-dot.compoff{ background:var(--accent-bg); color:var(--accent-dark); }
-<<<<<<< HEAD
   .status-dot.sitework{ background:#DBEAFE; color:#1D4ED8; }
   .mark-types{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:12px; }
-=======
-  .mark-types{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
->>>>>>> 40886b68476e5c3ce7826109068ac0efd20390fa
   .mark-type{ border:1px solid var(--line); border-radius:11px; padding:11px 12px; display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; cursor:pointer; background:#fff; }
   .mark-type input{ accent-color:var(--accent); margin:0; }
   .mark-type:has(input:checked){ border-color:var(--accent); background:var(--accent-bg); color:var(--accent-dark); }
@@ -354,10 +344,7 @@
   .att-cell.pl{ background:#FFF1CC; color:#8A6100; }
   .att-cell.el{ background:#EADFF8; color:#5B2E91; }
   .att-cell.co{ background:var(--accent-bg); color:var(--accent-dark); }
-<<<<<<< HEAD
   .att-cell.sw{ background:#DBEAFE; color:#1D4ED8; }
-=======
->>>>>>> 40886b68476e5c3ce7826109068ac0efd20390fa
   .att-cell.wr{ background:#EEF2FF; color:#4F46E5; }
   .att-cell.w{ background:#FFF8E1; color:var(--amber); }
   .att-legend{ display:flex; flex-wrap:wrap; gap:14px; font-size:12px; color:var(--ink-soft); margin:12px 0 4px; }
@@ -555,11 +542,7 @@
 
     <div id="view-report" style="display:none;">
       <div class="page-head">
-<<<<<<< HEAD
         <div><h1>Report</h1><p>Today's status for every member: Present, Absent, Comp-off, Site work or Leave. No check-in yet = Waiting response; it becomes Absent from the next day.</p></div>
-=======
-        <div><h1>Report</h1><p>Today's status for every member: Present, Absent, Comp-off or Leave. No check-in yet = Waiting response; it becomes Absent from the next day.</p></div>
->>>>>>> 40886b68476e5c3ce7826109068ac0efd20390fa
         <button class="btn btn-outline" id="exportBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Export CSV</button>
       </div>
       <div class="card" style="padding:18px 22px; overflow-x:auto;"><table class="report-table" id="reportTable"></table></div>
@@ -603,11 +586,7 @@
 
     <div id="view-attlog" style="display:none;">
       <div class="page-head">
-<<<<<<< HEAD
         <div><h1>Attendance log</h1><p>Member-wise register for the month: Present, Absent, Planned leave, Emergency leave, Comp-off and Site work. A past working day (Mon–Sat) with no check-in is marked Absent automatically.</p></div>
-=======
-        <div><h1>Attendance log</h1><p>Member-wise register for the month: Present, Absent, Planned leave, Emergency leave and Comp-off. A past working day (Mon–Sat) with no check-in is marked Absent automatically.</p></div>
->>>>>>> 40886b68476e5c3ce7826109068ac0efd20390fa
         <button class="btn btn-outline" id="attExportBtn">Export CSV</button>
       </div>
       <div class="card list-card">
@@ -618,11 +597,7 @@
           <input type="text" id="attSearch" placeholder="Search member…">
         </div>
         <div id="attLogBox"></div>
-<<<<<<< HEAD
         <div class="att-legend"><span><i style="background:var(--green-bg)"></i>P · Present</span><span><i style="background:var(--red-bg)"></i>A · Absent</span><span><i style="background:#FFF1CC"></i>PL · Planned leave</span><span><i style="background:#EADFF8"></i>EL · Emergency leave</span><span><i style="background:var(--accent-bg)"></i>CO · Comp-off</span><span><i style="background:#DBEAFE"></i>SW · Site work</span><span><i style="background:#FFF8E1"></i>… · Awaiting admin approval</span></div>
-=======
-        <div class="att-legend"><span><i style="background:var(--green-bg)"></i>P · Present</span><span><i style="background:var(--red-bg)"></i>A · Absent</span><span><i style="background:#FFF1CC"></i>PL · Planned leave</span><span><i style="background:#EADFF8"></i>EL · Emergency leave</span><span><i style="background:var(--accent-bg)"></i>CO · Comp-off</span><span><i style="background:#FFF8E1"></i>… · Awaiting admin approval</span></div>
->>>>>>> 40886b68476e5c3ce7826109068ac0efd20390fa
         <div class="section-sub" style="margin-top:6px">Click a member's name to open their day-by-day calendar. Present counts only after the admin approves the daily log. No check-in on a past Mon–Sat = Absent (automatic).</div>
       </div>
     </div>
@@ -837,11 +812,7 @@ function openSettings(){
     <div class="field"><label>Confirm new password</label><input type="password" id="stConf" autocomplete="new-password"></div>
     <div class="field"><label>Current password <span style="font-weight:400">(required to save)</span></label><input type="password" id="stCur" autocomplete="current-password"></div>
     <div class="modal-actions"><button class="btn btn-outline" id="mCancel">Close</button><button class="btn btn-blue" id="stSave">Save changes</button></div>
-<<<<<<< HEAD
     <div class="modal-section"><div class="section-title">All data</div><div class="section-sub">Browse and download everything stored in the system: attendance, members, leave, daily logs and Absent / Comp-off / Site work marks.</div><button class="btn btn-outline" id="stAllData">Open all data</button></div>
-=======
-    <div class="modal-section"><div class="section-title">All data</div><div class="section-sub">Browse and download everything stored in the system: attendance, members, leave, daily logs and Absent / Comp-off marks.</div><button class="btn btn-outline" id="stAllData">Open all data</button></div>
->>>>>>> 40886b68476e5c3ce7826109068ac0efd20390fa
     ${a.role==='super'?'<div class="modal-section"><div class="section-title">Other admins</div><div class="section-sub">Change another admin\'s username or reset their password.</div><div id="stAdmins"><div class="empty" style="padding:12px">Loading…</div></div></div>':''}`);
   document.getElementById('mCancel').onclick=closeModal;
   document.getElementById('stAllData').onclick=()=>openAllData('attendance');
@@ -879,11 +850,7 @@ function openEditAdmin(a){
   };
 }
 /* ---------- Settings > All data ---------- */
-<<<<<<< HEAD
 const AD_TABS=[['attendance','Attendance'],['members','Members'],['leaves','Leave'],['logs','Daily logs'],['marks','Absent / Comp-off / Site work']];
-=======
-const AD_TABS=[['attendance','Attendance'],['members','Members'],['leaves','Leave'],['logs','Daily logs'],['marks','Absent / Comp-off']];
->>>>>>> 40886b68476e5c3ce7826109068ac0efd20390fa
 let adKind='attendance',adDays='90',adRows=[],adTok=0;
 const adWho=x=>x.members||x;
 const adSpec={
@@ -945,11 +912,7 @@ async function openCalendar(id,month){
   const att={},mk={},lg={},leaveDays={};
   r.attendance.forEach(a=>att[a.date]=a);r.marks.forEach(k=>mk[k.date]=k);r.logs.forEach(l=>lg[l.date]=l);
   r.leaves.forEach(l=>{for(let d=1;d<=daysIn;d++){const ds=month+'-'+String(d).padStart(2,'0');if(ds>=l.fromDate&&ds<=l.toDate)leaveDays[ds]=l;}});
-<<<<<<< HEAD
   let present=0,absent=0,comp=0,site=0,leave=0,totMin=0,otMin=0,cells='';
-=======
-  let present=0,absent=0,comp=0,leave=0,totMin=0,otMin=0,cells='';
->>>>>>> 40886b68476e5c3ce7826109068ac0efd20390fa
   ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>cells+=`<div class="cal-dow">${d}</div>`);
   for(let i=0;i<startDow;i++)cells+='<div class="cal-cell empty"></div>';
   for(let d=1;d<=daysIn;d++){
@@ -961,11 +924,7 @@ async function openCalendar(id,month){
       if(w!=null){present++;totMin+=w;const ot=Math.max(0,w-OT_AFTER_MIN);otMin+=ot;cls='present';pa='p';if(ot>0)ws.push('OT '+hrs(ot)+'h');body+=`<div>${fmt12(a.checkIn)}–${fmt12(a.checkOut)}</div><div><b>${hrs(w)}h</b></div>`;}
       else{present++;cls='working';pa='w';body+=`<div>In ${fmt12(a.checkIn)}</div><div>No check-out</div>`;}
     }
-<<<<<<< HEAD
     if(k){if(k.type==='absent'){absent++;cls='absent';pa='a';if(k.subType==='public')ws.push('Public leave');}else if(k.type==='sitework'){site++;cls='sitework';}else{comp++;cls='compoff';}body+=`<div><span class="cal-tag ${k.type}">${MARK_LABEL[k.type]}${k.type==='absent'&&SUB_LABEL[k.subType]?' · '+SUB_LABEL[k.subType]:''}</span></div>${k.note?`<div title="${esc(k.note)}">${esc(k.note.slice(0,24))}</div>`:''}`;}
-=======
-    if(k){if(k.type==='absent'){absent++;cls='absent';pa='a';if(k.subType==='public')ws.push('Public leave');}else{comp++;cls='compoff';}body+=`<div><span class="cal-tag ${k.type}">${MARK_LABEL[k.type]}${k.type==='absent'&&SUB_LABEL[k.subType]?' · '+SUB_LABEL[k.subType]:''}</span></div>${k.note?`<div title="${esc(k.note)}">${esc(k.note.slice(0,24))}</div>`:''}`;}
->>>>>>> 40886b68476e5c3ce7826109068ac0efd20390fa
     if(lv&&!(a&&a.checkIn)&&!k){leave++;cls='leave';body+=`<div><span class="cal-tag leave">${lv.leaveType==='emergency'?'Emergency leave':'Planned leave'}</span></div><div title="${esc(lv.reason)}">${esc(lv.reason.slice(0,24))}</div>`;}
     else if(lv&&!k){leave++;body+=`<div><span class="cal-tag leave">${lv.leaveType==='emergency'?'Emergency leave':'Planned leave'}</span></div>`;}
     if(!k&&!lv&&!(a0&&a0.checkIn)&&dow!==0&&ds<today&&ds>=(r.member.createdAt||'0000-00-00')){absent++;cls='absent';pa='a';body+=`<div><span class="cal-tag absent">Absent</span></div><div>No check-in</div>`;}
@@ -978,15 +937,9 @@ async function openCalendar(id,month){
   const label=new Date(y,mo-1,1).toLocaleDateString(undefined,{month:'long',year:'numeric'});
   openModal(`<h2>${esc(r.member.name)}</h2><div class="section-sub">${esc(r.member.eid)} · ${esc(r.member.dept)}</div>
     <div class="cal-top"><button class="btn btn-outline btn-sm" id="calPrev">‹ Prev</button><div class="cal-title">${label}</div><button class="btn btn-outline btn-sm" id="calNext">Next ›</button></div>
-<<<<<<< HEAD
     <div class="cal-sum"><div><b>${present}</b>Days present</div><div><b>${absent}</b>Absent</div><div><b>${comp}</b>Comp-off</div><div><b>${site}</b>Site work</div><div><b>${leave}</b>Leave days</div><div><b>${hrs(totMin)}</b>Total hours</div><div><b>${hrs(otMin)}</b>OT hours</div></div>
     <div class="cal-grid">${cells}</div>
     <div class="cal-legend"><span><i style="background:#FFF3B0"></i>Working</span><span><i style="background:var(--green-bg)"></i>Present</span><span><i style="background:var(--red-bg)"></i>Absent</span><span><i style="background:var(--accent-bg)"></i>Comp-off</span><span><i style="background:#DBEAFE"></i>Site work</span><span><i style="background:#FFF1CC"></i>Leave</span><span><i style="background:#DBEAFE"></i>Work side (Sunday / Public leave / OT)</span></div>
-=======
-    <div class="cal-sum"><div><b>${present}</b>Days present</div><div><b>${absent}</b>Absent</div><div><b>${comp}</b>Comp-off</div><div><b>${leave}</b>Leave days</div><div><b>${hrs(totMin)}</b>Total hours</div><div><b>${hrs(otMin)}</b>OT hours</div></div>
-    <div class="cal-grid">${cells}</div>
-    <div class="cal-legend"><span><i style="background:#FFF3B0"></i>Working</span><span><i style="background:var(--green-bg)"></i>Present</span><span><i style="background:var(--red-bg)"></i>Absent</span><span><i style="background:var(--accent-bg)"></i>Comp-off</span><span><i style="background:#FFF1CC"></i>Leave</span><span><i style="background:#DBEAFE"></i>Work side (Sunday / Public leave / OT)</span></div>
->>>>>>> 40886b68476e5c3ce7826109068ac0efd20390fa
     <div class="modal-actions"><button class="btn btn-outline" id="mCancel">Close</button></div>`);
   document.getElementById('modalBox').classList.add('wide');
   document.getElementById('mCancel').onclick=closeModal;
@@ -995,7 +948,6 @@ async function openCalendar(id,month){
 }
 
 /* ---------- Absent / Comp-off ---------- */
-<<<<<<< HEAD
 const MARK_LABEL={absent:'Absent',compoff:'Comp-off',sitework:'Site work'};
 const SUB_LABEL={public:'Public leave',annual:'Annual leave'};
 async function openMarkModal(id,defType){
@@ -1003,26 +955,14 @@ async function openMarkModal(id,defType){
   defType=defType||'absent';
   openModal(`<h2>${defType==='sitework'?'Site work':'Absent / Comp-off / Site work'}</h2><div class="section-sub">${esc(m.name)} · ${esc(m.eid)}</div><div class="auth-error" id="modalError"></div>
     <div class="mark-types"><label class="mark-type"><input type="radio" name="mkType" value="absent">Absent</label><label class="mark-type"><input type="radio" name="mkType" value="compoff">Comp-off</label><label class="mark-type"><input type="radio" name="mkType" value="sitework">Site work</label></div>
-=======
-const MARK_LABEL={absent:'Absent',compoff:'Comp-off'};
-const SUB_LABEL={public:'Public leave',annual:'Annual leave'};
-async function openMarkModal(id){
-  const m=members.find(x=>x.id===id);if(!m)return;
-  openModal(`<h2>Absent / Comp-off</h2><div class="section-sub">${esc(m.name)} · ${esc(m.eid)}</div><div class="auth-error" id="modalError"></div>
-    <div class="mark-types"><label class="mark-type"><input type="radio" name="mkType" value="absent" checked>Absent</label><label class="mark-type"><input type="radio" name="mkType" value="compoff">Comp-off</label></div>
->>>>>>> 40886b68476e5c3ce7826109068ac0efd20390fa
     <div class="field mark-sub" id="mkSubBox"><label>Absent reason</label><select id="mkSub"><option value="annual">Annual leave</option><option value="public">Public leave</option></select></div>
     <div class="field"><label>Date</label><input type="date" id="mkDate" value="${todayStr}"></div>
     <div class="field"><label>Note <span style="font-weight:400">(optional)</span></label><input type="text" id="mkNote" maxlength="200" placeholder="e.g. Worked last Sunday"></div>
     <div class="modal-actions"><button class="btn btn-outline" id="mCancel">Close</button><button class="btn btn-blue" id="mkSave">Save mark</button></div>
     <div class="modal-section"><div class="section-title" style="font-size:13.5px">Recent marks</div><div id="mkList"><div class="empty" style="padding:12px">Loading…</div></div></div>`);
   document.getElementById('mCancel').onclick=closeModal;
-<<<<<<< HEAD
   const dr=document.querySelector('input[name="mkType"][value="'+defType+'"]');if(dr)dr.checked=true;
   const syncSub=()=>{const t=document.querySelector('input[name="mkType"]:checked').value;document.getElementById('mkSubBox').style.display=t==='absent'?'':'none';document.getElementById('mkNote').placeholder=t==='sitework'?'e.g. Site name / customer location':'e.g. Worked last Sunday';};
-=======
-  const syncSub=()=>{document.getElementById('mkSubBox').style.display=document.querySelector('input[name="mkType"]:checked').value==='absent'?'':'none';};
->>>>>>> 40886b68476e5c3ce7826109068ac0efd20390fa
   document.querySelectorAll('input[name="mkType"]').forEach(r=>r.onchange=syncSub);syncSub();
   document.getElementById('mkSave').onclick=async()=>{
     const type=document.querySelector('input[name="mkType"]:checked').value,date=document.getElementById('mkDate').value,subType=type==='absent'?document.getElementById('mkSub').value:'';
@@ -1042,11 +982,7 @@ async function loadMarkList(id){
 }
 /* ---------- Member-wise attendance log ---------- */
 let attLogMonth=null,attLogData=null;
-<<<<<<< HEAD
 const ATT_LABEL={P:'Present',A:'Absent',PL:'Planned leave',EL:'Emergency leave',CO:'Comp-off',SW:'Site work',W:'Awaiting approval',WR:'Waiting response'};
-=======
-const ATT_LABEL={P:'Present',A:'Absent',PL:'Planned leave',EL:'Emergency leave',CO:'Comp-off',W:'Awaiting approval',WR:'Waiting response'};
->>>>>>> 40886b68476e5c3ce7826109068ac0efd20390fa
 async function renderAttLog(month){
   const box=document.getElementById('attLogBox');
   month=month||attLogMonth||ymd(new Date()).slice(0,7);attLogMonth=month;
@@ -1061,19 +997,11 @@ function drawAttLog(){
   const rows=r.members.filter(m=>!q||(m.name+' '+m.eid+' '+m.dept).toLowerCase().includes(q));
   let head='<th class="att-name">Member</th>';
   for(let d=1;d<=r.daysIn;d++){const dow=new Date(y,mo-1,d).getDay();head+=`<th class="${dow===0?'att-sun':''}">${d}<small>${'SMTWTFS'[dow]}</small></th>`;}
-<<<<<<< HEAD
   head+='<th class="att-sum">P</th><th class="att-sum">A</th><th class="att-sum">PL</th><th class="att-sum">EL</th><th class="att-sum">CO</th><th class="att-sum">SW</th>';
   const body=rows.map(m=>{
     let tds=`<td class="att-name"><a data-cal="${m.id}">${esc(m.name)}</a><div class="m-id">${esc(m.eid)} · ${esc(m.dept)}</div></td>`;
     m.days.forEach((c,i)=>{const dow=new Date(y,mo-1,i+1).getDay(),ds=r.month+'-'+String(i+1).padStart(2,'0');tds+=c?`<td class="att-cell ${c.toLowerCase()}" title="${esc(m.name)} · ${ds} · ${ATT_LABEL[c]}">${c==='W'||c==='WR'?'…':c}</td>`:`<td class="${dow===0?'att-sun':''}"></td>`;});
     const t=m.totals;tds+=`<td class="att-sum">${t.P}</td><td class="att-sum">${t.A}</td><td class="att-sum">${t.PL}</td><td class="att-sum">${t.EL}</td><td class="att-sum">${t.CO}</td><td class="att-sum">${t.SW||0}</td>`;
-=======
-  head+='<th class="att-sum">P</th><th class="att-sum">A</th><th class="att-sum">PL</th><th class="att-sum">EL</th><th class="att-sum">CO</th>';
-  const body=rows.map(m=>{
-    let tds=`<td class="att-name"><a data-cal="${m.id}">${esc(m.name)}</a><div class="m-id">${esc(m.eid)} · ${esc(m.dept)}</div></td>`;
-    m.days.forEach((c,i)=>{const dow=new Date(y,mo-1,i+1).getDay(),ds=r.month+'-'+String(i+1).padStart(2,'0');tds+=c?`<td class="att-cell ${c.toLowerCase()}" title="${esc(m.name)} · ${ds} · ${ATT_LABEL[c]}">${c==='W'||c==='WR'?'…':c}</td>`:`<td class="${dow===0?'att-sun':''}"></td>`;});
-    const t=m.totals;tds+=`<td class="att-sum">${t.P}</td><td class="att-sum">${t.A}</td><td class="att-sum">${t.PL}</td><td class="att-sum">${t.EL}</td><td class="att-sum">${t.CO}</td>`;
->>>>>>> 40886b68476e5c3ce7826109068ac0efd20390fa
     return `<tr>${tds}</tr>`;
   }).join('');
   box.innerHTML=rows.length?`<div class="att-wrap"><table class="att-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`:'<div class="empty">No members found.</div>';
@@ -1082,11 +1010,7 @@ function drawAttLog(){
 function exportAttLogCSV(){
   const r=attLogData;if(!r){showToast('Open the Attendance Log first');return;}
   const dates=Array.from({length:r.daysIn},(_,i)=>r.month+'-'+String(i+1).padStart(2,'0'));
-<<<<<<< HEAD
   downloadCSV('attendance-log-'+r.month+'.csv',[['Name','Worker ID','Department',...dates,'Present','Absent','Planned leave','Emergency leave','Comp-off','Site work'],...r.members.map(m=>[m.name,m.eid,m.dept,...m.days.map(c=>c==='W'?'':(ATT_LABEL[c]||'')),m.totals.P,m.totals.A,m.totals.PL,m.totals.EL,m.totals.CO,m.totals.SW||0])]);
-=======
-  downloadCSV('attendance-log-'+r.month+'.csv',[['Name','Worker ID','Department',...dates,'Present','Absent','Planned leave','Emergency leave','Comp-off'],...r.members.map(m=>[m.name,m.eid,m.dept,...m.days.map(c=>c==='W'?'':(ATT_LABEL[c]||'')),m.totals.P,m.totals.A,m.totals.PL,m.totals.EL,m.totals.CO])]);
->>>>>>> 40886b68476e5c3ce7826109068ac0efd20390fa
   showToast('CSV downloaded');
 }
 async function renderActivity(){
@@ -1113,19 +1037,11 @@ function renderMembers(){
   document.getElementById('memberDateLabel').textContent=new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
   const q=(document.getElementById('searchInput').value||'').toLowerCase(),list=document.getElementById('memberList');
   const filtered=members.filter(m=>(m.name+' '+m.dept+' '+m.eid).toLowerCase().includes(q));
-<<<<<<< HEAD
   list.innerHTML=filtered.length?filtered.map(m=>{const rec=todayAttendance[m.id]||{},st=statusFor(m);return `<div class="member-row"><div class="m-who" data-act="cal" data-id="${m.id}" style="cursor:pointer" title="View calendar"><div class="m-avatar" style="background:${colorFor(m.id)}">${initials(m.name)}</div><div><div class="m-name">${esc(m.name)}</div><div class="m-id">${esc(m.eid)}</div></div></div><div class="m-dept">${esc(m.dept)}</div><div><div class="m-time-label">Check in</div><div class="m-time">${fmt12(rec.checkIn)}</div></div><div><span class="status-dot ${st.key}"><span class="d"></span>${st.label}</span></div><div class="m-actions"><button class="btn btn-outline btn-sm" data-act="cal" data-id="${m.id}">Calendar</button>${currentAdmin?.role==='super'?`<button class="btn btn-outline btn-sm" data-act="edit" data-id="${m.id}">Edit</button>`:''}<button class="btn btn-outline btn-sm" data-act="mark" data-id="${m.id}">Absent / Comp-off</button><button class="btn btn-outline btn-sm" data-act="site" data-id="${m.id}">Site work</button><button class="icon-del-btn" data-act="del" data-id="${m.id}">Remove</button></div></div>`}).join(''):'<div class="empty">No members yet — add one above to get started.</div>';
   list.querySelectorAll('[data-act="cal"]').forEach(b=>b.onclick=()=>openCalendar(b.dataset.id));list.querySelectorAll('[data-act="edit"]').forEach(b=>b.onclick=()=>openEditMember(b.dataset.id));list.querySelectorAll('[data-act="mark"]').forEach(b=>b.onclick=()=>openMarkModal(b.dataset.id));list.querySelectorAll('[data-act="site"]').forEach(b=>b.onclick=()=>openMarkModal(b.dataset.id,'sitework'));list.querySelectorAll('[data-act="del"]').forEach(b=>b.onclick=()=>removeMember(b.dataset.id));
 }
 const RSTAT_CLASS={'Waiting response':'pending','Present':'done','Absent':'absent','Comp-off':'compoff','Site work':'sitework','Leave':'leave','Sunday off':'notin'};
 function reportStatus(m){const rec=todayAttendance[m.id];if(rec&&rec.checkIn)return'Present';const mk=marks[m.id];if(mk==='compoff')return'Comp-off';if(mk==='sitework')return'Site work';if(mk==='absent')return'Absent';if(onLeave.includes(m.id))return'Leave';return new Date(todayStr+'T00:00:00').getDay()===0?'Sunday off':'Waiting response';}
-=======
-  list.innerHTML=filtered.length?filtered.map(m=>{const rec=todayAttendance[m.id]||{},st=statusFor(m);return `<div class="member-row"><div class="m-who" data-act="cal" data-id="${m.id}" style="cursor:pointer" title="View calendar"><div class="m-avatar" style="background:${colorFor(m.id)}">${initials(m.name)}</div><div><div class="m-name">${esc(m.name)}</div><div class="m-id">${esc(m.eid)}</div></div></div><div class="m-dept">${esc(m.dept)}</div><div><div class="m-time-label">Check in</div><div class="m-time">${fmt12(rec.checkIn)}</div></div><div><span class="status-dot ${st.key}"><span class="d"></span>${st.label}</span></div><div class="m-actions"><button class="btn btn-outline btn-sm" data-act="cal" data-id="${m.id}">Calendar</button>${currentAdmin?.role==='super'?`<button class="btn btn-outline btn-sm" data-act="edit" data-id="${m.id}">Edit</button>`:''}<button class="btn btn-outline btn-sm" data-act="mark" data-id="${m.id}">Absent / Comp-off</button><button class="icon-del-btn" data-act="del" data-id="${m.id}">Remove</button></div></div>`}).join(''):'<div class="empty">No members yet — add one above to get started.</div>';
-  list.querySelectorAll('[data-act="cal"]').forEach(b=>b.onclick=()=>openCalendar(b.dataset.id));list.querySelectorAll('[data-act="edit"]').forEach(b=>b.onclick=()=>openEditMember(b.dataset.id));list.querySelectorAll('[data-act="mark"]').forEach(b=>b.onclick=()=>openMarkModal(b.dataset.id));list.querySelectorAll('[data-act="del"]').forEach(b=>b.onclick=()=>removeMember(b.dataset.id));
-}
-const RSTAT_CLASS={'Waiting response':'pending','Present':'done','Absent':'absent','Comp-off':'compoff','Leave':'leave','Sunday off':'notin'};
-function reportStatus(m){const rec=todayAttendance[m.id];if(rec&&rec.checkIn)return'Present';const mk=marks[m.id];if(mk==='compoff')return'Comp-off';if(mk==='absent')return'Absent';if(onLeave.includes(m.id))return'Leave';return new Date(todayStr+'T00:00:00').getDay()===0?'Sunday off':'Waiting response';}
->>>>>>> 40886b68476e5c3ce7826109068ac0efd20390fa
 function renderReport(){document.getElementById('reportTable').innerHTML=`<thead><tr><th>Name</th><th>ID</th><th>Department</th><th>Check in</th><th>Check out</th><th>Status</th></tr></thead><tbody>${members.map(m=>{const r=todayAttendance[m.id]||{},s=reportStatus(m);return `<tr><td>${esc(m.name)}</td><td>${esc(m.eid)}</td><td>${esc(m.dept)}</td><td>${fmt12(r.checkIn)}</td><td>${fmt12(r.checkOut)}</td><td><span class="status-dot ${RSTAT_CLASS[s]||'notin'}"><span class="d"></span>${s}</span></td></tr>`}).join('')||'<tr><td colspan="6">No members yet.</td></tr>'}</tbody>`;}
 
 let workerHost='workerMain';
