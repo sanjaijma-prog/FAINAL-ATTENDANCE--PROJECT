@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="/jmalogo-main.png">
+<title>JAI MARUTHI AUTOMATION — Attendanc</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FAFAF8; --surface:#FFFFFF; --ink:#1A1A1A; --ink-soft:#7A7A75; --line:#EDEBE7;
+    --accent:#F97316; --accent-dark:#EA580C; --accent-bg:#FFF3E8;
+    --green:#16A37A; --green-bg:#E7F6F0;
+    --grey:#9A9A94; --grey-bg:#F3F2EF;
+    --amber:#C9862C; --amber-bg:#FDF3E3;
+    --red:#D14B3F; --red-bg:#FCEDEB;
+    --shadow:0 1px 2px rgba(26,26,26,.03);
+  }
+  *{box-sizing:border-box;}
+  .hidden{ display:none !important; }
+  html,body{margin:0;padding:0;}
+  body{ background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased; }
+  h1,h2,h3{ font-family:'Poppins',sans-serif; margin:0; letter-spacing:-0.01em; }
+  button{ font-family:inherit; cursor:pointer; transition:background .15s, border-color .15s, color .15s; }
+  input,select{ font-family:'Inter',sans-serif; }
+
+  /* Buttons */
+  .btn{ border:none; font-weight:600; font-size:13px; padding:10px 16px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; gap:6px; white-space:nowrap; }
+  .btn-blue{ background:var(--accent); color:#fff; }
+  .btn-blue:hover{ background:var(--accent-dark); }
+  .btn-blue:disabled{ background:#FBD3B0; cursor:not-allowed; }
+  .btn-outline{ background:#fff; color:var(--ink); border:1px solid var(--line); }
+  .btn-outline:hover{ border-color:var(--accent); color:var(--accent-dark); }
+  .btn-outline:disabled{ opacity:.5; cursor:not-allowed; }
+  .btn-sm{ padding:8px 12px; font-size:12.5px; border-radius:9px; }
+  .btn-lg{ padding:14px 20px; font-size:14.5px; border-radius:12px; }
+
+  /* Card */
+  .card{ background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); }
+  .section-title{ font-size:15.5px; font-weight:600; margin-bottom:2px; }
+  .section-sub{ font-size:12.5px; color:var(--ink-soft); margin-bottom:16px; }
+
+  /* Full-screen frames (landing / auth) — now light */
+  .dark-screen{ min-height:100vh; background:var(--bg); display:flex; align-items:center; justify-content:center; padding:24px; }
+  .dark-box{ width:100%; max-width:420px; }
+  .brand-center{ display:flex; align-items:center; gap:10px; justify-content:center; margin-bottom:30px; }
+  .logo-mark{ width:38px;height:38px;border-radius:10px; background:var(--accent); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .logo-mark svg{ width:19px;height:19px; }
+  .brand-center .logo-text{ color:var(--ink); font-weight:700; font-size:18px; }
+
+  .back-link{ display:inline-flex; align-items:center; gap:5px; background:none; border:none; color:var(--ink-soft); font-size:12.5px; font-weight:600; margin-bottom:18px; }
+  .back-link:hover{ color:var(--accent-dark); }
+  .back-link svg{ width:13px;height:13px; }
+
+  .option-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .option-card{ background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:24px 18px; text-align:left; display:flex; flex-direction:column; gap:12px; align-items:flex-start; color:var(--ink); }
+  .option-card:hover{ border-color:var(--accent); box-shadow:0 8px 22px -14px rgba(249,115,22,.5); }
+  .option-ico{ width:40px;height:40px;border-radius:11px; display:flex; align-items:center; justify-content:center; }
+  .option-card h3{ color:var(--ink); font-size:15.5px; }
+  .option-card p{ color:var(--ink-soft); font-size:12px; margin:0; line-height:1.5; }
+  .landing-sub{ color:var(--ink-soft); font-size:13px; text-align:center; margin:0 0 22px; }
+  .designer-sub{ color:var(--ink-soft); display: flex; align-items: center; justify-content: center; font-size: 13px; position: relative; bottom: 100px; }
+
+  .auth-box{ background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:28px 26px; }
+  .auth-heading{ color:var(--ink); font-size:16px; text-align:center; margin-bottom:20px; }
+  .field-dark{ margin-bottom:13px; }
+  .field-dark label{ display:block; font-size:11.5px; font-weight:600; color:var(--ink-soft); margin-bottom:6px; }
+  .field-dark input, .field-dark select{ width:100%; font-size:13.5px; padding:11px 13px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); }
+  .field-dark input::placeholder{ color:#B5B3AD; }
+  .field-dark input:focus, .field-dark select:focus{ outline:2px solid var(--accent); outline-offset:1px; background:#fff; }
+  .field-dark select option{ background:#fff; color:var(--ink); }
+  .auth-error{ background:var(--red-bg); color:var(--red); font-size:12.5px; padding:9px 12px; border-radius:9px; margin-bottom:13px; display:none; }
+  .auth-error.show{ display:block; }
+  .auth-note{ text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:16px; line-height:1.5; }
+  .auth-submit{ width:100%; justify-content:center; margin-top:4px; padding:12px; }
+  .otp-demo-box{ background:var(--accent-bg); border:1px dashed #F9B98A; border-radius:12px; padding:14px 16px; margin-bottom:16px; text-align:center; }
+  .otp-demo-box .otp-label{ font-size:11px; color:var(--ink-soft); margin-bottom:6px; }
+  .otp-demo-box .otp-code{ font-family:'Poppins',sans-serif; font-size:24px; font-weight:700; letter-spacing:6px; color:var(--accent-dark); }
+  .otp-demo-box .otp-expiry{ font-size:11px; color:var(--ink-soft); margin-top:6px; }
+
+  .pw-wrap{ position:relative; }
+  .pw-wrap input{ padding-right:40px !important; }
+  .pw-toggle{ position:absolute; right:4px; top:50%; transform:translateY(-50%); background:none; border:none; width:30px; height:30px; display:flex; align-items:center; justify-content:center; border-radius:8px; color:var(--ink-soft); }
+  .pw-toggle:hover{ color:var(--accent-dark); background:var(--accent-bg); }
+  .pw-toggle svg{ width:16px; height:16px; }
+
+  .auth-mode-toggle{ text-align:center; font-size:12.5px; color:var(--ink-soft); margin-top:14px; }
+  .auth-mode-toggle button{ background:none; border:none; color:var(--accent-dark); font-weight:600; font-size:12.5px; padding:0; margin-left:4px; }
+  .auth-mode-toggle button:hover{ text-decoration:underline; }
+  .pending-note{ background:var(--amber-bg); color:var(--amber); font-size:12.5px; padding:9px 12px; border-radius:9px; margin-bottom:13px; display:none; }
+  .pending-note.show{ display:block; }
+
+  .nav-link{ position:relative; }
+  .nav-badge{ position:absolute; top:2px; right:2px; background:var(--accent); color:#fff; font-size:9.5px; font-weight:700; min-width:16px; height:16px; border-radius:8px; display:flex; align-items:center; justify-content:center; padding:0 4px; }
+
+  .request-row{ display:grid; grid-template-columns:1.6fr 1fr 1fr auto; gap:10px; align-items:center; padding:13px 6px; border-top:1px solid var(--line); }
+  .request-row:first-of-type{ border-top:none; }
+  .request-actions{ display:flex; gap:8px; }
+  .btn-accept{ background:var(--green); color:#fff; }
+  .btn-accept:hover{ background:#12896A; }
+  .btn-deny{ background:#fff; color:var(--red); border:1px solid #F1C9C4; }
+  .btn-deny:hover{ background:var(--red-bg); }
+
+  .activity-card{ padding:20px 22px; margin-top:16px; }
+  .activity-row{ display:flex; align-items:center; justify-content:space-between; padding:11px 4px; border-top:1px solid var(--line); font-size:13px; }
+  .activity-row:first-of-type{ border-top:none; }
+  .activity-date{ font-weight:600; }
+  .activity-times{ color:var(--ink-soft); font-size:12.5px; display:flex; gap:14px; }
+  .limit-count-chip{ display:flex; align-items:center; gap:8px; background:var(--accent-bg); color:var(--accent-dark); font-size:12.5px; font-weight:600; padding:9px 12px; border-radius:10px; margin-bottom:10px; }
+
+  /* Navbar — white, hairline border */
+  .navbar{ background:var(--surface); border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; padding:12px 28px; position:sticky; top:0; z-index:20; }
+  .nav-left{ display:flex; align-items:center; gap:34px; }
+  .logo{ display:flex; align-items:center; gap:10px; }
+  .logo-text{ color:var(--ink); font-weight:700; font-size:15.5px; letter-spacing:-0.01em; }
+  .nav-links{ display:flex; gap:4px; }
+  .nav-link{ background:none; border:none; color:var(--ink-soft); font-size:13.5px; font-weight:500; padding:9px 14px; border-radius:9px; }
+  .nav-link:hover{ color:var(--ink); background:var(--grey-bg); }
+  .nav-link.active{ background:var(--accent-bg); color:var(--accent-dark); font-weight:600; }
+  .nav-right{ display:flex; align-items:center; gap:8px; }
+  .icon-btn{ width:36px;height:36px; border-radius:9px; border:1px solid var(--line); background:#fff; display:flex; align-items:center; justify-content:center; }
+  .icon-btn:hover{ border-color:var(--accent); }
+  .icon-btn svg{ width:16px;height:16px; stroke:var(--ink-soft); }
+  .logout-btn{ display:flex; align-items:center; gap:6px; background:#fff; border:1px solid var(--line); color:var(--ink); font-size:13px; font-weight:600; padding:8px 13px; border-radius:9px; }
+  .logout-btn:hover{ border-color:var(--accent); color:var(--accent-dark); }
+  .logout-btn svg{ width:14px;height:14px; }
+  .user-chip{ display:flex; align-items:center; gap:8px; background:var(--grey-bg); border-radius:10px; padding:5px 12px 5px 5px; }
+  .user-chip .u-avatar{ width:26px;height:26px;border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; }
+  .user-chip .u-name{ font-size:12.5px; font-weight:600; color:var(--ink); }
+
+  /* Layout */
+  .main{ max-width:1100px; margin:0 auto; padding:32px 24px 60px; }
+  .page-head{ display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:22px; flex-wrap:wrap; gap:12px; }
+  .page-head h1{ font-size:24px; font-weight:700; margin-bottom:4px; }
+  .page-head p{ margin:0; color:var(--ink-soft); font-size:13.5px; }
+  .clock-chip{ background:var(--surface); border:1px solid var(--line); border-radius:11px; padding:9px 14px; text-align:right; }
+  .clock-time{ font-weight:700; font-size:14.5px; color:var(--accent-dark); }
+  .clock-date{ font-size:11.5px; color:var(--ink-soft); }
+.logoNav{ height:40px; width:auto; display:block; }
+.logoMain {
+    display: block;
+    width: 250px;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    margin: 0 auto 12px;
+}
+
+  .chip-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:20px; }
+  .chip{ background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:15px 17px; display:flex; align-items:center; gap:12px; }
+  .chip-ico{ width:38px;height:38px;border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .chip-ico svg{ width:17px;height:17px; }
+  .chip-label{ font-size:12px; color:var(--ink-soft); }
+  .chip-value{ font-family:'Poppins',sans-serif; font-size:20px; font-weight:700; }
+
+  .add-card{ padding:20px 22px; margin-bottom:18px; }
+  .add-grid{ display:grid; grid-template-columns:1.2fr 0.9fr 0.9fr 0.7fr auto; gap:10px; align-items:end; }
+  .field label{ display:block; font-size:11.5px; font-weight:600; color:var(--ink-soft); margin-bottom:5px; }
+  .field input{ width:100%; font-size:13.5px; padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); }
+  .field input:focus{ outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); background:#fff; }
+
+  .list-card{ padding:20px 22px; }
+  .list-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .search-box{ display:flex; align-items:center; gap:7px; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; width:220px; }
+  .search-box:focus-within{ border-color:var(--accent); background:#fff; }
+  .search-box svg{ width:14px;height:14px; stroke:var(--ink-soft); flex-shrink:0; }
+  .search-box input{ border:none; background:none; outline:none; font-size:13px; width:100%; color:var(--ink); }
+
+  .member-row{ display:grid; grid-template-columns: 1.8fr 1fr 0.9fr 1fr auto; gap:10px; align-items:center; padding:13px 6px; border-top:1px solid var(--line); }
+  .member-row:first-of-type{ border-top:none; }
+  .m-who{ display:flex; align-items:center; gap:11px; min-width:0; }
+  .m-avatar{ width:36px;height:36px;border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:12.5px; flex-shrink:0; }
+  .m-name{ font-size:13.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .m-id{ font-size:11.5px; color:var(--ink-soft); }
+  .m-dept{ font-size:13px; color:var(--ink-soft); }
+  .m-time-label{ font-size:10.5px; color:var(--ink-soft); margin-bottom:2px; }
+  .m-time{ font-size:13px; font-weight:600; }
+  .m-actions{ display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+  .icon-del-btn{ background:none; border:1px solid var(--line); color:var(--ink-soft); border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; white-space:nowrap; padding:0 8px; min-width:30px; height:30px; }
+  .icon-del-btn:hover{ background:var(--red-bg); border-color:#F1C9C4; color:var(--red); }
+  .status-dot{ display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:600; padding:4px 10px; border-radius:20px; }
+  .status-dot.notin{ background:var(--grey-bg); color:var(--grey); }
+  .status-dot.working{ background:#FFF3B0; color:#8A6D00; }
+  .status-dot.done{ background:var(--green-bg); color:var(--green); }
+  .status-dot .d{ width:6px;height:6px;border-radius:50%; background:currentColor; }
+  .limit-pill{ font-size:10.5px; font-weight:600; padding:3px 8px; border-radius:8px; background:var(--grey-bg); color:var(--ink-soft); }
+  .limit-pill.maxed{ background:var(--red-bg); color:var(--red); }
+  .empty{ padding:34px 10px; text-align:center; color:var(--ink-soft); font-size:13.5px; }
+
+  .report-table{ width:100%; border-collapse:collapse; font-size:13px; }
+  .report-table th{ text-align:left; font-size:11.5px; color:var(--ink-soft); font-weight:600; padding:8px 10px; border-bottom:1px solid var(--line); }
+  .report-table td{ padding:10px 10px; border-bottom:1px solid var(--line); }
+  .report-table tbody tr:hover{ background:var(--accent-bg); }
+
+  /* Worker screen */
+  .worker-wrap{ min-height:100vh; background:var(--bg); }
+  .worker-topbar{ background:var(--surface); border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; padding:12px 24px; }
+  .worker-main{ max-width:480px; margin:0 auto; padding:30px 20px 60px; }
+  .worker-card{ padding:24px 22px; text-align:center; margin-bottom:16px; }
+  .worker-avatar-lg{ width:64px;height:64px;border-radius:50%; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:20px; }
+  .worker-name{ font-family:'Poppins',sans-serif; font-size:18px; font-weight:700; }
+  .worker-role{ font-size:12.5px; color:var(--ink-soft); margin-bottom:12px; }
+  .worker-metrics{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:16px 0; }
+  .worker-metric{ background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:12px; }
+  .worker-metric-label{ font-size:11px; color:var(--ink-soft); margin-bottom:4px; }
+  .worker-metric-value{ font-size:15px; font-weight:700; }
+  .worker-actions{ display:flex; gap:10px; margin-top:6px; }
+  .worker-actions .btn{ flex:1; }
+
+  .manual-card{ padding:20px 22px; }
+  .manual-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+  .manual-fields{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:9px; margin:14px 0; }
+  .manual-fields select, .manual-fields input{ width:100%; font-size:13px; padding:10px 11px; border-radius:9px; border:1px solid var(--line); background:var(--bg); color:var(--ink); }
+  .manual-fields select:focus, .manual-fields input:focus{ outline:2px solid var(--accent); outline-offset:1px; background:#fff; }
+  .limit-banner{ display:flex; align-items:center; gap:8px; font-size:12px; font-weight:600; padding:9px 12px; border-radius:10px; background:var(--amber-bg); color:var(--amber); margin-bottom:10px; }
+  .limit-banner.blocked{ background:var(--red-bg); color:var(--red); }
+
+  /* Daily log */
+  .log-card{ padding:20px 22px; margin-bottom:16px; }
+  .log-card textarea{ width:100%; min-height:92px; resize:vertical; font-family:'Inter',sans-serif; font-size:13.5px; line-height:1.5; padding:11px 13px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); margin:4px 0 12px; }
+  .log-card textarea:focus{ outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); background:#fff; }
+  .log-card textarea:disabled{ opacity:.75; cursor:not-allowed; }
+  .log-banner{ display:flex; align-items:center; gap:8px; font-size:12px; font-weight:600; padding:9px 12px; border-radius:10px; margin-bottom:10px; }
+  .log-banner.pending{ background:var(--amber-bg); color:var(--amber); }
+  .log-banner.approved{ background:var(--green-bg); color:var(--green); }
+  .log-banner.denied{ background:var(--red-bg); color:var(--red); }
+  .lock-hint{ display:flex; align-items:center; gap:8px; justify-content:center; font-size:12px; font-weight:600; color:var(--ink-soft); background:var(--grey-bg); border-radius:10px; padding:9px 12px; margin-top:12px; }
+  .lock-hint svg{ width:14px; height:14px; flex-shrink:0; }
+  .status-dot.pending{ background:var(--amber-bg); color:var(--amber); }
+  .status-dot.approved{ background:var(--green-bg); color:var(--green); }
+  .status-dot.denied{ background:var(--red-bg); color:var(--red); }
+  .log-row{ display:grid; grid-template-columns:1.1fr 2.4fr 0.7fr auto; gap:12px; align-items:start; padding:14px 6px; border-top:1px solid var(--line); }
+  .log-row:first-of-type{ border-top:none; }
+  .log-task{ font-size:13px; line-height:1.5; white-space:pre-wrap; word-break:break-word; }
+  .log-time{ font-size:12px; color:var(--ink-soft); }
+
+  /* Modal */
+  .modal-backdrop{ position:fixed; inset:0; background:rgba(26,26,26,.35); display:flex; align-items:center; justify-content:center; padding:20px; z-index:50; }
+  .modal{ width:100%; max-width:460px; max-height:90vh; overflow:auto; padding:24px; border-radius:18px; box-shadow:0 20px 50px -20px rgba(26,26,26,.35); }
+  .modal h2{ font-size:17px; margin-bottom:2px; }
+  .modal.wide{ max-width:760px; }
+  .modal.xwide{ max-width:1000px; }
+  .ad-tabs{ display:flex; flex-wrap:wrap; gap:6px; margin:12px 0; }
+  .ad-tabs button{ border:1px solid var(--line); background:#fff; border-radius:9px; padding:7px 12px; font-size:12.5px; font-weight:600; cursor:pointer; color:var(--ink-soft); }
+  .ad-tabs button.on{ background:var(--accent-bg); color:var(--accent-dark); border-color:var(--accent); }
+  .ad-tools{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:10px; }
+  .ad-tools input,.ad-tools select{ padding:8px 11px; border:1px solid var(--line); border-radius:9px; font-size:13px; background:#fff; }
+  .cal-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:14px 0 10px; }
+  .cal-top .cal-title{ font-family:'Poppins',sans-serif; font-weight:600; font-size:15px; }
+  .cal-sum{ display:grid; grid-template-columns:repeat(auto-fit,minmax(96px,1fr)); gap:8px; margin-bottom:12px; }
+  .cal-sum div{ background:var(--accent-bg); border-radius:10px; padding:8px 10px; font-size:11.5px; color:var(--ink-soft,#666); }
+  .cal-sum b{ display:block; font-size:16px; color:var(--ink,#1a1a1a); }
+  .cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+  .cal-dow{ text-align:center; font-size:11px; font-weight:600; color:var(--ink-soft,#666); padding:4px 0; }
+  .cal-cell{ min-height:74px; border:1px solid var(--line); border-radius:9px; padding:4px 5px; font-size:10.5px; line-height:1.3; background:#fff; overflow:hidden; }
+  .cal-cell.empty{ border:none; background:none; }
+  .cal-cell.today{ outline:2px solid var(--accent); }
+  .cal-cell .dn{ font-weight:700; font-size:11.5px; margin-bottom:2px; }
+  .cal-cell.sun{ background:#FAFAFA; }
+  .cal-cell.present{ background:var(--green-bg); }
+  .cal-cell.working{ background:#FFF3B0; }
+  .cal-cell.absent{ background:var(--red-bg); }
+  .cal-cell.compoff{ background:var(--accent-bg); }
+  .cal-cell.sitework{ background:#DBEAFE; }
+  .cal-cell.leave{ background:#FFF1CC; }
+  .cal-tag{ display:inline-block; font-weight:700; font-size:10px; padding:1px 5px; border-radius:6px; }
+  .cal-tag.absent{ background:var(--red); color:#fff; }
+  .cal-tag.compoff{ background:var(--accent-dark); color:#fff; }
+  .cal-tag.sitework{ background:#1D4ED8; color:#fff; }
+  .cal-tag.leave{ background:#E0A100; color:#fff; }
+  .cal-tag.ot{ background:var(--accent-dark); color:#fff; }
+  .cal-nolog{ color:var(--red); font-weight:600; }
+  .cal-pa{ font-size:9.5px; font-weight:700; margin-left:4px; }
+  .cal-pa.p{ color:var(--green); } .cal-pa.a{ color:var(--red); } .cal-pa.w{ color:#8A6D00; }
+  .cal-ws{ margin-top:3px; background:#DBEAFE; color:#1D4ED8; border-radius:6px; padding:1px 5px; font-weight:700; font-size:9.5px; display:block; }
+  .cal-ws small{ font-weight:500; opacity:.8; margin-right:3px; }
+  .mark-sub{ margin-bottom:12px; }
+  .mark-sub select{ width:100%; font-size:13.5px; padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); }
+  .cal-legend{ display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; font-size:11px; }
+  .cal-legend i{ display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:4px; vertical-align:-1px; border:1px solid var(--line); }
+  @media(max-width:560px){ .cal-cell{ min-height:60px; font-size:9.5px; padding:3px; } }
+  .modal .field{ margin-bottom:12px; }
+  .modal-actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:16px; }
+  .modal-section{ border-top:1px solid var(--line); margin-top:20px; padding-top:16px; }
+  .admin-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 0; border-top:1px solid var(--line); }
+  .admin-row:first-of-type{ border-top:none; }
+
+  /* Leave */
+  .status-dot.leave{ background:var(--amber-bg); color:var(--amber); }
+  .leave-card{ padding:20px 22px; margin-bottom:16px; }
+  .leave-dates{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0 4px; }
+  .leave-dates label, .leave-label{ display:block; font-size:11.5px; font-weight:600; color:var(--ink-soft); margin-bottom:5px; }
+  .leave-dates input{ width:100%; font-size:13.5px; padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); }
+  .leave-card textarea{ width:100%; min-height:76px; resize:vertical; font-family:'Inter',sans-serif; font-size:13.5px; line-height:1.5; padding:11px 13px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); margin:0 0 12px; }
+  .leave-card textarea:focus, .leave-dates input:focus{ outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); background:#fff; }
+  .leave-item{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; padding:12px 0; border-top:1px solid var(--line); }
+  .leave-item:first-of-type{ border-top:none; }
+  .leave-item-dates{ font-size:13px; font-weight:600; }
+  .leave-item-reason{ font-size:12.5px; color:var(--ink-soft); margin-top:2px; white-space:pre-wrap; word-break:break-word; }
+  .leave-item-right{ display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0; }
+  .link-btn{ background:none; border:none; padding:0; font-size:11.5px; font-weight:600; color:var(--ink-soft); text-decoration:underline; }
+  .link-btn:hover{ color:var(--red); }
+
+  .status-dot.absent{ background:var(--red-bg); color:var(--red); }
+  .status-dot.compoff{ background:var(--accent-bg); color:var(--accent-dark); }
+  .status-dot.sitework{ background:#DBEAFE; color:#1D4ED8; }
+  .mark-types{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:12px; }
+  .mark-type{ border:1px solid var(--line); border-radius:11px; padding:11px 12px; display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; cursor:pointer; background:#fff; }
+  .mark-type input{ accent-color:var(--accent); margin:0; }
+  .mark-type:has(input:checked){ border-color:var(--accent); background:var(--accent-bg); color:var(--accent-dark); }
+
+  /* Toast */
+  .toast{ position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--ink); color:#fff; padding:11px 18px; border-radius:11px; font-size:13px; font-weight:500; opacity:0; transition:opacity .2s, transform .2s; pointer-events:none; z-index:60; }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  @media (max-width:760px){
+    .option-grid{ grid-template-columns:1fr; }
+    .add-grid{ grid-template-columns:1fr 1fr; }
+    .add-grid > button{ grid-column:1/-1; }
+    .chip-row{ grid-template-columns:1fr; }
+    .member-row{ grid-template-columns:1fr; gap:8px; }
+    .m-actions{ grid-column:1/-1; }
+    .nav-links{ display:none; }
+    .manual-fields{ grid-template-columns:1fr; }
+    .log-row{ grid-template-columns:1fr; gap:8px; }
+    .navbar{ padding:12px 16px; }
+  }
+  /* Attendance log (member-wise register) */
+  .att-wrap{ overflow:auto; max-height:68vh; border:1px solid var(--line); border-radius:12px; }
+  .att-table{ border-collapse:separate; border-spacing:0; font-size:12px; min-width:100%; }
+  .att-table th,.att-table td{ padding:6px 4px; border-bottom:1px solid var(--line); text-align:center; min-width:30px; white-space:nowrap; background:#fff; }
+  .att-table th{ position:sticky; top:0; z-index:2; font-weight:600; color:var(--ink-soft); }
+  .att-table th small{ display:block; font-weight:500; font-size:10px; }
+  .att-table .att-name{ position:sticky; left:0; z-index:1; text-align:left; min-width:160px; padding-left:12px; border-right:1px solid var(--line); }
+  .att-table th.att-name{ z-index:3; }
+  .att-table .att-sum{ font-weight:700; min-width:34px; }
+  .att-table .att-sun{ background:var(--grey-bg); }
+  .att-name a{ font-weight:600; cursor:pointer; color:var(--ink); }
+  .att-name a:hover{ color:var(--accent-dark); }
+  .att-cell{ font-weight:700; font-size:11px; }
+  .att-cell.p{ background:var(--green-bg); color:var(--green); }
+  .att-cell.a{ background:var(--red-bg); color:var(--red); }
+  .att-cell.pl{ background:#FFF1CC; color:#8A6100; }
+  .att-cell.el{ background:#EADFF8; color:#5B2E91; }
+  .att-cell.co{ background:var(--accent-bg); color:var(--accent-dark); }
+  .att-cell.sw{ background:#DBEAFE; color:#1D4ED8; }
+  .att-cell.wr{ background:#EEF2FF; color:#4F46E5; }
+  .att-cell.w{ background:#FFF8E1; color:var(--amber); }
+  .att-legend{ display:flex; flex-wrap:wrap; gap:14px; font-size:12px; color:var(--ink-soft); margin:12px 0 4px; }
+  .att-legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .att-legend i{ display:inline-block; width:14px; height:14px; border-radius:4px; }
+  .att-tools{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:12px; }
+  .att-tools input[type=text]{ padding:9px 12px; border:1px solid var(--line); border-radius:10px; font-size:13px; }
+  .att-tools label{ font-size:12.5px; color:var(--ink-soft); display:inline-flex; gap:6px; align-items:center; }
+  .leave-types{ display:flex; gap:10px; margin:10px 0 4px; }
+  .leave-type{ flex:1; border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:13px; font-weight:600; display:flex; gap:8px; align-items:center; cursor:pointer; background:#fff; }
+  .leave-type:has(input:checked){ border-color:var(--accent); background:var(--accent-bg); }
+  .leave-type-hint{ font-size:12px; color:var(--ink-soft); margin:2px 0 6px; }
+  .lt-tag{ display:inline-block; font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:6px; margin-left:6px; vertical-align:middle; }
+  .lt-tag.planned{ background:#FFF1CC; color:#8A6100; }
+  .lt-tag.emergency{ background:#EADFF8; color:#5B2E91; }
+</style>
+</head>
+<body>
+
+<!-- ============ LANDING ============ -->
+<div class="dark-screen" id="landingScreen">
+  <div class="dark-box">
+    <div class="brand-center">
+      <img src="/jmalogo-main.png" alt="Jai Maruthi Automation Logo" class="logoMain">
+    </div>
+    <p class="landing-sub">Choose how you'd like to sign in.</p>
+    <div class="option-grid">
+      <button class="option-card" id="goAdmin">
+        <div class="option-ico" style="background:var(--accent-bg)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5l-8-3Z"/></svg></div>
+        <h3>Admin login</h3>
+        <p>Add or remove workers, view reports, approve leave and manage attendance.</p>
+      </button>
+      <button class="option-card" id="goWorker">
+        <div class="option-ico" style="background:var(--green-bg)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c0-4 3.4-6.2 7.5-6.2s7.5 2.2 7.5 6.2"/></svg></div>
+        <h3>Worker login</h3>
+        <p>Log in with your Worker ID and PIN to check in, check out and request leave.</p>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="designer-sub">
+  <span>Designd and Developed by :Akash Raj</span>
+</div>
+
+<!-- ============ ADMIN AUTH ============ -->
+<div class="dark-screen hidden" id="adminAuthScreen">
+  <div class="dark-box">
+    <div class="brand-center">
+      <img src="/jmalogo-main.png" alt="Jai Maruthi Automation Logo" class="logoMain">
+    </div>
+    <div class="auth-box">
+      <button class="back-link" id="backFromAdmin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>Back</button>
+      <h2 class="auth-heading" id="adminAuthHeading">Admin log in</h2>
+      <div class="auth-error" id="adminError"></div>
+      <div class="pending-note" id="adminPendingNote">Your account is waiting for approval from the admin who created this workspace.</div>
+      <div id="adminNameField" class="field-dark hidden"><label>Full name</label><input type="text" id="suName" placeholder="Your name"></div>
+      <div class="field-dark"><label>Username</label><input type="text" id="adminUsername" placeholder="e.g. admin"></div>
+      <div id="adminEmailField" class="field-dark hidden"><label>Recovery email</label><input type="email" id="suEmail" placeholder="you@company.com"></div>
+      <div class="field-dark">
+        <label>Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="adminPassword" placeholder="••••••••">
+          <button type="button" class="pw-toggle" data-target="adminPassword" aria-label="Show password"></button>
+        </div>
+      </div>
+      <div id="adminConfirmField" class="field-dark hidden">
+        <label>Confirm password</label>
+        <div class="pw-wrap">
+          <input type="password" id="suConfirm" placeholder="••••••••">
+          <button type="button" class="pw-toggle" data-target="suConfirm" aria-label="Show password"></button>
+        </div>
+      </div>
+      <button class="btn btn-blue auth-submit" id="adminSubmit">Log in</button>
+      <button class="back-link" id="forgotPasswordLink" style="margin:12px auto 0; display:block;">Forgot password?</button>
+      <p class="auth-note" id="adminNote">Only the admin can add or remove workers.</p>
+      <p class="auth-mode-toggle" id="adminModeToggleWrap"><span id="adminModeToggleText">New here?</span><button type="button" id="adminModeToggleBtn">Request admin access</button></p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ADMIN PASSWORD RESET ============ -->
+<div class="dark-screen hidden" id="adminResetScreen">
+  <div class="dark-box">
+    <div class="brand-center">
+      <img src="/jmalogo-main.png" alt="Jai Maruthi Automation Logo" class="logoMain">
+    </div>
+    <div class="auth-box">
+      <button class="back-link" id="backFromReset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>Back to log in</button>
+
+      <!-- Step 1: request OTP -->
+      <div id="resetStep1">
+        <h2 class="auth-heading">Reset admin password</h2>
+        <div class="auth-error" id="resetError1"></div>
+        <div class="field-dark"><label>Admin username</label><input type="text" id="resetUsername" placeholder="e.g. admin"></div>
+        <button class="btn btn-blue auth-submit" id="sendOtpBtn">Send OTP</button>
+        <p class="auth-note">We'll generate a one-time code tied to this admin's recovery email.</p>
+      </div>
+
+      <!-- Step 2: verify OTP -->
+      <div id="resetStep2" class="hidden">
+        <h2 class="auth-heading">Enter the code</h2>
+        <div class="auth-error" id="resetError2"></div>
+        <div class="otp-demo-box" id="otpDemoBox"></div>
+        <div class="field-dark"><label>6-digit OTP</label><input type="text" inputmode="numeric" maxlength="6" id="otpInput" placeholder="000000"></div>
+        <button class="btn btn-blue auth-submit" id="verifyOtpBtn">Verify code</button>
+        <button class="back-link" id="resendOtpBtn" style="margin:12px auto 0; display:block;">Resend code</button>
+      </div>
+
+      <!-- Step 3: new password -->
+      <div id="resetStep3" class="hidden">
+        <h2 class="auth-heading">Set a new password</h2>
+        <div class="auth-error" id="resetError3"></div>
+        <div class="field-dark"><label>New password</label><div class="pw-wrap"><input type="password" id="resetNewPass" placeholder="••••••••"><button type="button" class="pw-toggle" data-target="resetNewPass" aria-label="Show password"></button></div></div>
+        <div class="field-dark"><label>Confirm new password</label><div class="pw-wrap"><input type="password" id="resetConfirmPass" placeholder="••••••••"><button type="button" class="pw-toggle" data-target="resetConfirmPass" aria-label="Show password"></button></div></div>
+        <button class="btn btn-blue auth-submit" id="savePasswordBtn">Save new password</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="dark-screen hidden" id="workerAuthScreen">
+  <div class="dark-box">
+    <div class="brand-center">
+      <img src="/jmalogo-main.png" alt="Jai Maruthi Automation Logo" class="logoMain">
+    </div>
+    <div class="auth-box">
+      <button class="back-link" id="backFromWorker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>Back</button>
+      <h2 class="auth-heading">Worker log in</h2>
+      <div class="auth-error" id="workerError"></div>
+      <div class="field-dark">
+        <label>Worker ID</label>
+        <input type="text" id="workerEid" list="workerIdList" placeholder="Select or type your Worker ID" autocomplete="off" autocapitalize="characters"><datalist id="workerIdList"></datalist>
+      </div>
+      <div class="field-dark"><label>PIN</label><div class="pw-wrap"><input type="password" inputmode="numeric" maxlength="4" id="workerPin" placeholder="4-digit PIN"><button type="button" class="pw-toggle" data-target="workerPin" aria-label="Show PIN"></button></div></div>
+      <button class="btn btn-blue auth-submit" id="workerSubmit">Log in</button>
+      <p class="auth-note">Ask your admin if you don't know your Worker ID or PIN.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ADMIN APP ============ -->
+<div id="appRoot" class="hidden">
+  <div class="navbar">
+    <div class="nav-left">
+      <div class="logo">
+        <img src="/jmalogo-main.png" alt="Jai Maruthi Automation Logo" class="logoNav">
+      </div>
+      <div class="nav-links">
+        <button class="nav-link active" data-view="overview">Overview</button>
+        <button class="nav-link" data-view="report">Report</button>
+        <button class="nav-link" data-view="activity">Daily Activity</button>
+        <button class="nav-link" data-view="attlog">Attendance Log</button>
+        <button class="nav-link" data-view="dailylog">Daily Log<span class="nav-badge hidden" id="logsBadge">0</span></button>
+        <button class="nav-link" data-view="leave">Leave<span class="nav-badge hidden" id="leaveBadge">0</span></button>
+        <button class="nav-link" data-view="linkmember">Link Admin Member</button>
+        <button class="nav-link hidden" data-view="myworker" id="myWorkerNavLink">My Worker Dashboard</button>
+        <button class="nav-link hidden" data-view="requests" id="requestsNavLink">Requests<span class="nav-badge hidden" id="requestsBadge">0</span></button>
+      </div>
+    </div>
+    <div class="nav-right">
+      <div class="user-chip" id="userChip"></div>
+      <button class="icon-btn" id="settingsBtn" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2.1-1.2L14 3h-4l-.5 2.6a7 7 0 0 0-2.1 1.2l-2.3-.9-2 3.4 2 1.5a7 7 0 0 0 0 2.4l-2 1.5 2 3.4 2.3-.9a7 7 0 0 0 2.1 1.2L10 21h4l.5-2.6a7 7 0 0 0 2.1-1.2l2.3.9 2-3.4-2-1.5c.07-.4.1-.8.1-1.2Z"/></svg></button>
+      <button class="logout-btn" id="adminLogoutBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>Logout</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="view-overview">
+      <div class="page-head">
+        <div><h1>Overview</h1><p>Add workers and manage today's check-ins.</p></div>
+        <div class="clock-chip"><div class="clock-time" id="liveClock">--:--:--</div><div class="clock-date" id="liveDate">—</div></div>
+      </div>
+
+      <div class="chip-row" id="chipRow"></div>
+
+      <div class="card add-card">
+        <div class="section-title">Add member</div>
+        <div class="section-sub">Give them a Worker ID and a 4-digit PIN — they log in with these on the worker side.</div>
+        <div class="add-grid">
+          <div class="field"><label>Full name</label><input type="text" id="newName" placeholder="e.g. Amara Diallo"></div>
+          <div class="field"><label>Worker ID (used to log in)</label><input type="text" id="newEid" placeholder="e.g. EMP-014"></div>
+          <div class="field"><label>Department</label><input type="text" id="newDept" placeholder="e.g. Production"></div>
+          <div class="field"><label>PIN</label><input type="text" inputmode="numeric" maxlength="4" id="newPin" placeholder="1234"></div>
+          <button class="btn btn-blue" id="addBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>Add member</button>
+        </div>
+      </div>
+
+      <div class="card list-card">
+        <div class="list-top">
+          <div><div class="section-title" style="margin-bottom:0">Members</div><div class="section-sub" style="margin-bottom:0">Today, <span id="memberDateLabel"></span></div></div>
+          <div class="search-box"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input type="text" id="searchInput" placeholder="Search members..."></div>
+        </div>
+        <div id="memberList"></div>
+      </div>
+    </div>
+
+    <div id="view-report" style="display:none;">
+      <div class="page-head">
+        <div><h1>Report</h1><p>Today's status for every member: Present, Absent, Comp-off, Site work or Leave. No check-in yet = Waiting response; it becomes Absent from the next day.</p></div>
+        <button class="btn btn-outline" id="exportBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Export CSV</button>
+      </div>
+      <div class="card" style="padding:18px 22px; overflow-x:auto;"><table class="report-table" id="reportTable"></table></div>
+    </div>
+
+    <div id="view-activity" style="display:none;">
+      <div class="page-head">
+        <div><h1>Daily Activity</h1><p>Check-in and check-out history across all members and days.</p></div>
+        <button class="btn btn-outline" id="activityExportBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Export CSV</button>
+      </div>
+      <div class="card" style="padding:18px 22px; overflow-x:auto;"><table class="report-table" id="activityTable"></table></div>
+    </div>
+
+    <div id="view-dailylog" style="display:none;">
+      <div class="page-head">
+        <div><h1>Daily log</h1><p>Review what workers did today. Approved logs are saved. Denied logs are recorded as "Daily log not provided" under the worker's name.</p></div>
+      </div>
+      <div class="card list-card" style="margin-bottom:18px;">
+        <div class="section-title">Pending requests</div><div class="section-sub">Waiting for your confirmation.</div>
+        <div id="dailyLogPending"></div>
+      </div>
+      <div class="card list-card">
+        <div class="section-title">Recent history</div><div class="section-sub">Last 30 days.</div>
+        <div style="overflow-x:auto"><table class="report-table" id="dailyLogHistory"></table></div>
+      </div>
+    </div>
+
+    <div id="view-leave" style="display:none;">
+      <div class="page-head">
+        <div><h1>Leave requests</h1><p>Approve or deny leave. Approved leave marks the worker "On leave" and blocks check-in on those dates.</p></div>
+      </div>
+      <div class="card list-card" style="margin-bottom:18px;">
+        <div class="section-title">Pending requests</div><div class="section-sub">Waiting for your decision.</div>
+        <div id="leavePending"></div>
+      </div>
+      <div class="card list-card">
+        <div class="section-title">All leave</div><div class="section-sub">Recent requests.</div>
+        <div style="overflow-x:auto"><table class="report-table" id="leaveHistory"></table></div>
+      </div>
+    </div>
+
+    <div id="view-attlog" style="display:none;">
+      <div class="page-head">
+        <div><h1>Attendance log</h1><p>Member-wise register for the month: Present, Absent, Planned leave, Emergency leave, Comp-off and Site work. A past working day (Mon–Sat) with no check-in is marked Absent automatically.</p></div>
+        <button class="btn btn-outline" id="attExportBtn">Export CSV</button>
+      </div>
+      <div class="card list-card">
+        <div class="att-tools">
+          <button class="btn btn-outline btn-sm" id="attPrev">‹ Prev</button>
+          <strong id="attTitle" style="min-width:130px;text-align:center"></strong>
+          <button class="btn btn-outline btn-sm" id="attNext">Next ›</button>
+          <input type="text" id="attSearch" placeholder="Search member…">
+        </div>
+        <div id="attLogBox"></div>
+        <div class="att-legend"><span><i style="background:var(--green-bg)"></i>P · Present</span><span><i style="background:var(--red-bg)"></i>A · Absent</span><span><i style="background:#FFF1CC"></i>PL · Planned leave</span><span><i style="background:#EADFF8"></i>EL · Emergency leave</span><span><i style="background:var(--accent-bg)"></i>CO · Comp-off</span><span><i style="background:#DBEAFE"></i>SW · Site work</span><span><i style="background:#FFF8E1"></i>… · Awaiting admin approval</span></div>
+        <div class="section-sub" style="margin-top:6px">Click a member's name to open their day-by-day calendar. Present counts only after the admin approves the daily log. No check-in on a past Mon–Sat = Absent (automatic).</div>
+      </div>
+    </div>
+
+    <div id="view-linkmember" style="display:none;">
+      <div class="page-head">
+        <div><h1>Link admin member</h1><p>Select the member that is you. A "My Worker Dashboard" tab then appears in this admin dashboard so you can check in, check out, send your daily log and request leave.</p></div>
+        <div class="search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input type="text" id="linkSearch" placeholder="Search members"></div>
+      </div>
+      <div id="linkCurrent"></div>
+      <div class="card list-card"><div id="linkList"></div></div>
+    </div>
+
+    <div id="view-myworker" style="display:none;">
+      <div class="page-head"><div><h1>My worker dashboard</h1><p>Your own attendance as a worker. Your daily log still needs approval from an admin.</p></div></div>
+      <div class="worker-main" id="myWorkerMain" style="padding-top:0"></div>
+    </div>
+
+    <div id="view-requests" style="display:none;">
+      <div class="page-head">
+        <div><h1>Admin requests</h1><p>Accept or deny people who requested admin access.</p></div>
+      </div>
+      <div class="card list-card"><div id="requestsList"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ WORKER APP ============ -->
+<div id="workerAppScreen" class="worker-wrap hidden">
+  <div class="worker-topbar">
+    <div class="logo"><img src="/jmalogo-main.png" alt="Jai Maruthi Automation Logo" class="logoNav"></div>
+    <button class="logout-btn" id="workerLogoutBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>Logout</button>
+  </div>
+  <div class="worker-main" id="workerMain"></div>
+</div>
+
+<div class="modal-backdrop hidden" id="modal"><div class="card modal" id="modalBox"></div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const AVATAR_COLORS = ['#F97316','#EA580C','#FB923C','#D97706','#C2410C','#F59E0B','#B45309','#E8590C'];
+let members = [], todayAttendance = {}, todayStr = ymd(new Date());
+let currentAdmin = null, currentWorker = null, settings = {companyName:'JAI MARUTHI AUTOMATION'};
+
+function ymd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function nowHM(){ const d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+function fmt12(hm){ if(!hm) return '—'; const [h,m]=hm.split(':').map(Number); const p=h>=12?'PM':'AM'; let hh=h%12;if(hh===0)hh=12;return hh+':'+String(m).padStart(2,'0')+' '+p; }
+function initials(name){ return name.split(' ').filter(Boolean).map(s=>s[0]).slice(0,2).join('').toUpperCase(); }
+function colorFor(id){ let h=0; for(const c of id) h=(h*31+c.charCodeAt(0))>>>0; return AVATAR_COLORS[h%AVATAR_COLORS.length]; }
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(showToast._tm);showToast._tm=setTimeout(()=>t.classList.remove('show'),1800);}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+async function api(url, options={}) {
+  const r=await fetch(url,{credentials:'same-origin',headers:{'Content-Type':'application/json',...(options.headers||{})},...options});
+  let data=null; try{data=await r.json();}catch{}
+  if(!r.ok) throw new Error(data?.error||'Request failed');
+  return data;
+}
+let onLeave=[],marks={};
+async function loadState(){
+  const s=await api('/api/bootstrap');
+  members=s.members||[]; todayAttendance=s.today||{}; onLeave=s.onLeave||[];marks=s.marks||{}; settings=s.settings||settings;
+  todayStr=s.date||ymd(new Date());
+}
+function showScreen(id){['landingScreen','adminAuthScreen','adminResetScreen','workerAuthScreen','appRoot','workerAppScreen'].forEach(s=>document.getElementById(s).classList.toggle('hidden',s!==id));}
+
+let adminAuthMode='setup';
+function setAdminFieldsVisible(show){['adminNameField','adminEmailField','adminConfirmField'].forEach(id=>document.getElementById(id).classList.toggle('hidden',!show));}
+async function openAdminAuth(){
+  const s=await api('/api/bootstrap'); const admins=s.adminCount||0;
+  adminAuthMode=admins===0?'setup':'login'; applyAdminAuthMode(); showScreen('adminAuthScreen');
+}
+function applyAdminAuthMode(){
+  const setup=adminAuthMode==='setup', signup=adminAuthMode==='signup', login=adminAuthMode==='login';
+  setAdminFieldsVisible(setup||signup);
+  document.getElementById('forgotPasswordLink').classList.toggle('hidden',!login);
+  document.getElementById('adminAuthHeading').textContent=setup?'Create the admin account':signup?'Request admin access':'Admin log in';
+  document.getElementById('adminSubmit').textContent=setup?'Create admin account':signup?'Send request':'Log in';
+  document.getElementById('adminNote').textContent=setup?'This first account becomes the super admin.':signup?'Your request must be approved by the super admin.':'Only approved admins can manage attendance.';
+  const wrap=document.getElementById('adminModeToggleWrap');
+  wrap.classList.toggle('hidden',setup);
+  if(!setup){document.getElementById('adminModeToggleText').textContent=login?'New here?':'Already approved?';document.getElementById('adminModeToggleBtn').textContent=login?'Request admin access':'Log in instead';}
+  document.getElementById('adminError').classList.remove('show');document.getElementById('adminPendingNote').classList.remove('show');
+}
+document.getElementById('adminModeToggleBtn').addEventListener('click',()=>{adminAuthMode=adminAuthMode==='login'?'signup':'login';applyAdminAuthMode();});
+
+async function handleAdminSubmit(){
+  const username=document.getElementById('adminUsername').value.trim(), password=document.getElementById('adminPassword').value;
+  const err=document.getElementById('adminError'); err.classList.remove('show');
+  try{
+    if(adminAuthMode==='setup'||adminAuthMode==='signup'){
+      const body={username,password,name:document.getElementById('suName').value.trim(),email:document.getElementById('suEmail').value.trim(),mode:adminAuthMode};
+      if(!body.username||!body.password||!body.name||!body.email) throw Error('Complete all required fields.');
+      if(password.length<8) throw Error('Password should be at least 8 characters.');
+      if(password!==document.getElementById('suConfirm').value) throw Error('Passwords do not match.');
+      const r=await api('/api/admin/auth',{method:'POST',body:JSON.stringify(body)});
+      if(r.pending){document.getElementById('adminPendingNote').classList.add('show');adminAuthMode='login';applyAdminAuthMode();document.getElementById('adminPendingNote').classList.add('show');showToast('Request sent');return;}
+      currentAdmin=r.admin; await loadState(); enterAdminApp(); return;
+    }
+    const r=await api('/api/admin/auth',{method:'POST',body:JSON.stringify({username,password,mode:'login'})});
+    currentAdmin=r.admin; await loadState(); enterAdminApp();
+  }catch(e){err.textContent=e.message;err.classList.add('show');}
+}
+function enterAdminApp(){
+  document.getElementById('adminUsername').value='';document.getElementById('adminPassword').value='';
+  ['suConfirm','suName','suEmail'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('userChip').innerHTML=`<div class="u-avatar" style="background:${colorFor(currentAdmin.id)}">${initials(currentAdmin.name)}</div><span class="u-name">${esc(currentAdmin.name.split(' ')[0])}</span>`;
+  document.getElementById('requestsNavLink').classList.toggle('hidden',currentAdmin.role!=='super');
+  showScreen('appRoot');renderAdmin();refreshLink();
+}
+async function renderRequests(){
+  const list=document.getElementById('requestsList');
+  try{
+    const r=await api('/api/admin/requests');const pending=r.requests||[];
+    list.innerHTML=pending.length?pending.map(a=>`<div class="request-row"><div><div class="m-name">${esc(a.name)}</div><div class="m-id">@${esc(a.username)}</div></div><div class="m-dept">${esc(a.email||'—')}</div><div class="m-dept">${new Date(a.createdAt).toLocaleDateString()}</div><div class="request-actions"><button class="btn btn-sm btn-accept" data-act="accept" data-id="${a.id}">Accept</button><button class="btn btn-sm btn-deny" data-act="deny" data-id="${a.id}">Deny</button></div></div>`).join(''):'<div class="empty">No pending admin requests.</div>';
+    list.querySelectorAll('[data-act]').forEach(b=>b.onclick=async()=>{try{await api('/api/admin/requests/'+b.dataset.id,{method:'PATCH',body:JSON.stringify({status:b.dataset.act==='accept'?'approved':'denied'})});renderRequests();refreshRequestsBadge();}catch(e){showToast(e.message);}});
+    refreshRequestsBadge();
+  }catch(e){list.innerHTML=`<div class="empty">${esc(e.message)}</div>`;}
+}
+async function refreshRequestsBadge(){if(!currentAdmin||currentAdmin.role!=='super')return;try{const r=await api('/api/admin/requests');const n=r.requests.length,b=document.getElementById('requestsBadge');b.textContent=n;b.classList.toggle('hidden',n===0);}catch{}}
+
+async function openAdminReset(){document.getElementById('resetUsername').value='';['resetStep1','resetStep2','resetStep3'].forEach((id,i)=>document.getElementById(id).classList.toggle('hidden',i!==0));document.querySelectorAll('[id^="resetError"]').forEach(e=>e.classList.remove('show'));showScreen('adminResetScreen');}
+let otpToken=null;
+async function sendOtp(){
+  const e=document.getElementById('resetError1');e.classList.remove('show');
+  try{const r=await api('/api/admin/password/otp',{method:'POST',body:JSON.stringify({username:document.getElementById('resetUsername').value.trim()})});
+    otpToken=r.token;document.getElementById('otpDemoBox').innerHTML=`<div class="otp-label">${esc(r.message)}</div>${r.code?`<div class="otp-code">${esc(r.code)}</div>`:''}<div class="otp-expiry">Expires in 5 minutes</div>`;
+    document.getElementById('resetStep1').classList.add('hidden');document.getElementById('resetStep2').classList.remove('hidden');
+  }catch(x){e.textContent=x.message;e.classList.add('show');}
+}
+async function verifyOtp(){
+  const e=document.getElementById('resetError2');e.classList.remove('show');
+  try{await api('/api/admin/password/verify',{method:'POST',body:JSON.stringify({token:otpToken,code:document.getElementById('otpInput').value.trim()})});document.getElementById('resetStep2').classList.add('hidden');document.getElementById('resetStep3').classList.remove('hidden');}
+  catch(x){e.textContent=x.message;e.classList.add('show');}
+}
+async function saveNewPassword(){
+  const e=document.getElementById('resetError3');e.classList.remove('show');const p=document.getElementById('resetNewPass').value;
+  try{if(p.length<8)throw Error('Password should be at least 8 characters.');if(p!==document.getElementById('resetConfirmPass').value)throw Error('Passwords do not match.');
+    await api('/api/admin/password/reset',{method:'POST',body:JSON.stringify({token:otpToken,password:p})});showToast('Password reset');setTimeout(openAdminAuth,500);
+  }catch(x){e.textContent=x.message;e.classList.add('show');}
+}
+
+
+async function loadWorkerIds(){try{const r=await api('/api/worker/ids');document.getElementById('workerIdList').innerHTML=(r.ids||[]).map(i=>`<option value="${esc(i)}"></option>`).join('');}catch{}}
+async function openWorkerAuth(){loadWorkerIds();document.getElementById('workerEid').value='';document.getElementById('workerPin').value='';document.getElementById('workerError').classList.remove('show');showScreen('workerAuthScreen');setTimeout(()=>document.getElementById('workerEid').focus(),50);}
+async function handleWorkerSubmit(){
+  const err=document.getElementById('workerError');err.classList.remove('show');
+  try{const r=await api('/api/worker/auth',{method:'POST',body:JSON.stringify({eid:document.getElementById('workerEid').value.trim(),pin:document.getElementById('workerPin').value.trim()})});currentWorker=r.worker;await loadState();showScreen('workerAppScreen');await renderWorker('workerMain');}
+  catch(e){err.textContent=e.message;err.classList.add('show');}
+}
+async function logout(){clearInterval(window._logPoll);try{await api('/api/logout',{method:'POST'});}catch{}currentAdmin=null;currentWorker=null;showScreen('landingScreen');}
+
+async function addMember(name,eid,dept,pin){await api('/api/members',{method:'POST',body:JSON.stringify({name,eid,dept,pin})});await loadState();renderAdmin();}
+async function removeMember(id){try{await api('/api/members/'+id,{method:'DELETE'});await loadState();showToast('Member removed');renderAdmin();}catch(e){showToast(e.message);}}
+
+async function quickCheckIn(id){try{const u=(currentAdmin&&!currentWorker)?'/api/attendance/'+id+'/check-in':'/api/worker/check-in';await api(u,{method:'POST'});await loadState();showToast('Checked in');}catch(e){showToast(e.message);}}
+async function quickCheckOut(id,task){try{const adm=!!currentAdmin&&!currentWorker,u=adm?'/api/attendance/'+id+'/check-out':'/api/worker/check-out';const r=await api(u,{method:'POST',body:JSON.stringify(adm?{}:{task})});await loadState();showToast(!adm&&r&&r.pendingApproval?'Checked out — request sent to admin for approval':'Checked out');}catch(e){showToast(e.message);}}
+async function manualEntry(id,type,dateStr,timeStr){try{await api('/api/attendance/'+id+'/manual',{method:'POST',body:JSON.stringify({type,date:dateStr,time:timeStr})});await loadState();showToast('Manual entry saved');return true;}catch(e){showToast(e.message);return false;}}
+
+function renderAdmin(){renderChips();renderMembers();renderReport();refreshLogsBadge();refreshLeaveBadge();if(currentAdmin?.role==='super')refreshRequestsBadge();}
+const LOG_LABEL={pending:'Pending',approved:'Approved',denied:'Denied'};
+const NOT_PROVIDED='Daily log not provided';
+function fmtTime(iso){return iso?new Date(iso).toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'}):'—';}
+async function refreshLogsBadge(){if(!currentAdmin)return;try{const r=await api('/api/admin/daily-logs?days=1');const n=r.pendingCount||0,b=document.getElementById('logsBadge');b.textContent=n;b.classList.toggle('hidden',n===0);}catch{}}
+async function renderDailyLogs(){
+  const pendEl=document.getElementById('dailyLogPending'),histEl=document.getElementById('dailyLogHistory');
+  try{
+    const r=await api('/api/admin/daily-logs?days=30');const rows=r.rows||[],pending=rows.filter(x=>x.status==='pending');
+    pendEl.innerHTML=pending.length?pending.map(x=>`<div class="log-row"><div><div class="m-name">${esc(x.name)}</div><div class="m-id">${esc(x.eid)} · ${esc(x.dept)}</div></div><div class="log-task">${esc(x.task)}</div><div class="log-time">${esc(x.date)}<br>${fmtTime(x.submittedAt)}</div><div class="request-actions"><button class="btn btn-sm btn-accept" data-act="approved" data-id="${x.id}">Approve</button><button class="btn btn-sm btn-deny" data-act="denied" data-id="${x.id}">Deny</button></div></div>`).join(''):'<div class="empty">No pending daily logs.</div>';
+    pendEl.querySelectorAll('[data-act]').forEach(b=>b.onclick=async()=>{b.disabled=true;try{await api('/api/admin/daily-logs/'+b.dataset.id,{method:'PATCH',body:JSON.stringify({status:b.dataset.act})});showToast(b.dataset.act==='approved'?'Approved — daily log saved':'Denied');}catch(e){showToast(e.message);}renderDailyLogs();});
+    histEl.innerHTML=`<thead><tr><th>Date</th><th>Name</th><th>Task</th><th>Status</th></tr></thead><tbody>${rows.length?rows.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.name)}</td><td style="max-width:360px;white-space:pre-wrap;word-break:break-word">${x.status==='denied'?'<span style="color:var(--red);font-weight:600">'+NOT_PROVIDED+'</span>':esc(x.task)}</td><td><span class="status-dot ${x.status}"><span class="d"></span>${LOG_LABEL[x.status]}</span></td></tr>`).join(''):'<tr><td colspan="4" style="text-align:center;padding:20px">No daily logs yet.</td></tr>'}</tbody>`;
+    const n=pending.length,bd=document.getElementById('logsBadge');bd.textContent=n;bd.classList.toggle('hidden',n===0);
+  }catch(e){pendEl.innerHTML=`<div class="empty">${esc(e.message)}</div>`;}
+}
+setInterval(()=>{if(!currentAdmin)return;refreshLeaveBadge();if(document.getElementById('view-leave').style.display==='block')renderLeaves();refreshLogsBadge();if(document.getElementById('view-dailylog').style.display==='block')renderDailyLogs();},15000);
+/* ---------- Modal helpers ---------- */
+function openModal(html){const b=document.getElementById('modalBox');b.classList.remove('wide','xwide');b.innerHTML=html;document.getElementById('modal').classList.remove('hidden');}
+function closeModal(){document.getElementById('modal').classList.add('hidden');document.getElementById('modalBox').innerHTML='';}
+function modalErr(msg){const e=document.getElementById('modalError');if(!e)return showToast(msg);e.textContent=msg;e.classList.add('show');}
+document.getElementById('modal').addEventListener('mousedown',e=>{if(e.target.id==='modal')closeModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+/* ---------- Edit member ---------- */
+function openEditMember(id){
+  if(currentAdmin?.role!=='super'){showToast('Only the primary admin can edit members');return;}
+  const m=members.find(x=>x.id===id);if(!m)return;
+  openModal(`<h2>Edit member</h2><div class="section-sub">Correct a spelling mistake, Worker ID, department or PIN.</div><div class="auth-error" id="modalError"></div>
+    <div class="field"><label>Full name</label><input type="text" id="emName" value="${esc(m.name)}"></div>
+    <div class="field"><label>Worker ID</label><input type="text" id="emEid" value="${esc(m.eid)}"></div>
+    <div class="field"><label>Department</label><input type="text" id="emDept" value="${esc(m.dept)}"></div>
+    <div class="field"><label>New PIN</label><input type="text" inputmode="numeric" maxlength="4" id="emPin" placeholder="Leave blank to keep the current PIN"></div>
+    <div class="modal-actions"><button class="btn btn-outline" id="mCancel">Cancel</button><button class="btn btn-blue" id="emSave">Save changes</button></div>`);
+  document.getElementById('mCancel').onclick=closeModal;
+  document.getElementById('emSave').onclick=async()=>{
+    const name=document.getElementById('emName').value.trim(),pin=document.getElementById('emPin').value.trim();
+    if(!name)return modalErr('Name cannot be empty.');
+    if(!document.getElementById('emEid').value.trim())return modalErr('Worker ID cannot be empty.');
+    if(pin&&!/^\d{4}$/.test(pin))return modalErr('PIN must be exactly 4 digits.');
+    try{
+      await api('/api/members/'+id,{method:'PATCH',body:JSON.stringify({name,eid:document.getElementById('emEid').value.trim(),dept:document.getElementById('emDept').value.trim(),pin})});
+      await loadState();closeModal();renderAdmin();showToast('Member updated');
+    }catch(e){modalErr(e.message);}
+  };
+}
+
+/* ---------- Settings: admin login management ---------- */
+function openSettings(){
+  const a=currentAdmin;
+  openModal(`<h2>Settings</h2><div class="section-sub">Manage your admin login and open all stored data.</div><div class="auth-error" id="modalError"></div>
+    <div class="field"><label>Username</label><input type="text" id="stUser" value="${esc(a.username)}" autocomplete="off"></div>
+    <div class="field"><label>New password <span style="font-weight:400">(optional, 8+ characters)</span></label><input type="password" id="stNew" autocomplete="new-password"></div>
+    <div class="field"><label>Confirm new password</label><input type="password" id="stConf" autocomplete="new-password"></div>
+    <div class="field"><label>Current password <span style="font-weight:400">(required to save)</span></label><input type="password" id="stCur" autocomplete="current-password"></div>
+    <div class="modal-actions"><button class="btn btn-outline" id="mCancel">Close</button><button class="btn btn-blue" id="stSave">Save changes</button></div>
+    <div class="modal-section"><div class="section-title">All data</div><div class="section-sub">Browse and download everything stored in the system: attendance, members, leave, daily logs and Absent / Comp-off / Site work marks.</div><button class="btn btn-outline" id="stAllData">Open all data</button></div>
+    ${a.role==='super'?'<div class="modal-section"><div class="section-title">Other admins</div><div class="section-sub">Change another admin\'s username or reset their password.</div><div id="stAdmins"><div class="empty" style="padding:12px">Loading…</div></div></div>':''}`);
+  document.getElementById('mCancel').onclick=closeModal;
+  document.getElementById('stAllData').onclick=()=>openAllData('attendance');
+  document.getElementById('stSave').onclick=async()=>{
+    const nw=document.getElementById('stNew').value;
+    if(nw&&nw.length<8)return modalErr('New password must be at least 8 characters.');
+    if(nw!==document.getElementById('stConf').value)return modalErr('New passwords do not match.');
+    if(!document.getElementById('stCur').value)return modalErr('Enter your current password to save changes.');
+    try{
+      const r=await api('/api/admin/account',{method:'PATCH',body:JSON.stringify({username:document.getElementById('stUser').value.trim(),newPassword:nw,currentPassword:document.getElementById('stCur').value})});
+      currentAdmin=r.admin;closeModal();showToast('Login details updated');
+    }catch(e){modalErr(e.message);}
+  };
+  if(a.role==='super')loadOtherAdmins();
+}
+async function loadOtherAdmins(){
+  const box=document.getElementById('stAdmins');if(!box)return;
+  try{
+    const r=await api('/api/admin/admins');const list=r.admins||[];
+    box.innerHTML=list.length?list.map(x=>`<div class="admin-row"><div><div class="m-name">${esc(x.name)}</div><div class="m-id">@${esc(x.username)}</div></div><button class="btn btn-outline btn-sm" data-id="${x.id}">Edit</button></div>`).join(''):'<div class="empty" style="padding:12px">No other admins yet.</div>';
+    box.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>openEditAdmin(list.find(x=>x.id===b.dataset.id)));
+  }catch(e){box.innerHTML=`<div class="empty" style="padding:12px">${esc(e.message)}</div>`;}
+}
+function openEditAdmin(a){
+  openModal(`<h2>Edit admin login</h2><div class="section-sub">${esc(a.name)}</div><div class="auth-error" id="modalError"></div>
+    <div class="field"><label>Username</label><input type="text" id="eaUser" value="${esc(a.username)}" autocomplete="off"></div>
+    <div class="field"><label>New password <span style="font-weight:400">(leave blank to keep current)</span></label><input type="password" id="eaPass" autocomplete="new-password"></div>
+    <div class="modal-actions"><button class="btn btn-outline" id="mBack">Back</button><button class="btn btn-blue" id="eaSave">Save changes</button></div>`);
+  document.getElementById('mBack').onclick=openSettings;
+  document.getElementById('eaSave').onclick=async()=>{
+    const pw=document.getElementById('eaPass').value;
+    if(pw&&pw.length<8)return modalErr('Password must be at least 8 characters.');
+    try{await api('/api/admin/admins/'+a.id,{method:'PATCH',body:JSON.stringify({username:document.getElementById('eaUser').value.trim(),password:pw})});showToast('Admin login updated');openSettings();}
+    catch(e){modalErr(e.message);}
+  };
+}
+/* ---------- Settings > All data ---------- */
+const AD_TABS=[['attendance','Attendance'],['members','Members'],['leaves','Leave'],['logs','Daily logs'],['marks','Absent / Comp-off / Site work']];
+let adKind='attendance',adDays='90',adRows=[],adTok=0;
+const adWho=x=>x.members||x;
+const adSpec={
+  attendance:{h:['Date','Name','Worker ID','Department','Check in','Check out','Hours worked','OT (over 9)','Approval'],f:x=>{const w=adWho(x),c=hoursCols(x.check_in,x.check_out);return[x.date,w.name,w.eid,w.dept,fmt12(x.check_in),fmt12(x.check_out),c[0],c[2],x.counted===false?'Waiting approval':'Counted'];}},
+  members:{h:['Name','Worker ID','Department','Added on'],f:x=>[x.name,x.eid,x.dept,(x.created_at||'').slice(0,10)]},
+  leaves:{h:['Name','Worker ID','Type','From','To','Reason','Status'],f:x=>{const w=adWho(x);return[w.name,w.eid,x.leave_type==='emergency'?'Emergency leave':'Planned leave',x.from_date,x.to_date,x.reason,LOG_LABEL[x.status]||x.status];}},
+  logs:{h:['Date','Name','Worker ID','Task','Status'],f:x=>{const w=adWho(x);return[x.date,w.name,w.eid,x.status==='denied'?NOT_PROVIDED:x.task,LOG_LABEL[x.status]||x.status];}},
+  marks:{h:['Date','Name','Worker ID','Type','Note'],f:x=>{const w=adWho(x);return[x.date,w.name,w.eid,(MARK_LABEL[x.type]||x.type)+(x.type==='absent'&&SUB_LABEL[x.sub_type]?' · '+SUB_LABEL[x.sub_type]:''),x.note||''];}}
+};
+function openAllData(kind){
+  adKind=kind||adKind;
+  const b=document.getElementById('modalBox');
+  openModal(`<h2>All data</h2><div class="section-sub">Everything stored in the system. Use Download CSV to get the full list.</div>
+    <div class="ad-tabs">${AD_TABS.map(([k,l])=>`<button data-k="${k}" class="${k===adKind?'on':''}">${l}</button>`).join('')}</div>
+    <div class="ad-tools"><select id="adDays" ${adKind==='members'?'style="display:none"':''}><option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="365">Last 365 days</option><option value="all">All time</option></select><input type="text" id="adSearch" placeholder="Search…"><button class="btn btn-outline btn-sm" id="adCsv">Download CSV</button></div>
+    <div id="adBox"><div class="empty">Loading…</div></div>
+    <div class="modal-actions"><button class="btn btn-outline" id="mBack">Back</button><button class="btn btn-outline" id="mCancel">Close</button></div>`);
+  b.classList.add('xwide');
+  document.getElementById('adDays').value=adDays;
+  document.getElementById('mCancel').onclick=closeModal;document.getElementById('mBack').onclick=openSettings;
+  b.querySelectorAll('.ad-tabs button').forEach(x=>x.onclick=()=>openAllData(x.dataset.k));
+  document.getElementById('adDays').onchange=e=>{adDays=e.target.value;openAllData(adKind);};
+  document.getElementById('adSearch').oninput=adDraw;
+  document.getElementById('adCsv').onclick=()=>{const sp=adSpec[adKind];if(!adRows.length){showToast('Nothing to download');return;}downloadCSV('all-'+adKind+'.csv',[sp.h,...adRows.map(sp.f)]);showToast('CSV downloaded');};
+  const tok=++adTok;
+  api('/api/admin/data/'+adKind+'?days='+adDays).then(r=>{if(tok!==adTok)return;adRows=r.rows||[];adDraw();}).catch(e=>{if(tok!==adTok)return;adRows=[];const bx=document.getElementById('adBox');if(bx)bx.innerHTML=`<div class="empty">${esc(e.message)}</div>`;});
+}
+function adDraw(){
+  const bx=document.getElementById('adBox');if(!bx)return;
+  const sp=adSpec[adKind],q=(document.getElementById('adSearch').value||'').trim().toLowerCase();
+  const all=adRows.map(x=>({x,c:sp.f(x)})).filter(o=>!q||o.c.join(' ').toLowerCase().includes(q));
+  const shown=all.slice(0,300);
+  bx.innerHTML=all.length?`<div style="overflow:auto;max-height:52vh"><table class="report-table"><thead><tr>${sp.h.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${shown.map(o=>`<tr>${o.c.map(v=>`<td style="max-width:260px;white-space:pre-wrap;word-break:break-word">${esc(v??'')||'—'}</td>`).join('')}</tr>`).join('')}</tbody></table></div><div class="section-sub" style="margin-top:8px">${all.length} record${all.length===1?'':'s'}${all.length>shown.length?` · showing the first ${shown.length} — download the CSV for all of them`:''}</div>`:'<div class="empty">No records found.</div>';
+}
+function fmtDay(d){return new Date(d+'T00:00:00').toLocaleDateString(undefined,{day:'numeric',month:'short'});}
+function leaveTag(t){return `<span class="lt-tag ${t==='emergency'?'emergency':'planned'}">${t==='emergency'?'Emergency leave':'Planned leave'}</span>`;}
+function fmtLeaveRange(a,b){const n=Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000)+1;return (a===b?fmtDay(a):fmtDay(a)+' – '+fmtDay(b))+` (${n} day${n>1?'s':''})`;}
+async function refreshLeaveBadge(){if(!currentAdmin)return;try{const r=await api('/api/admin/leaves');const n=r.pendingCount||0,b=document.getElementById('leaveBadge');b.textContent=n;b.classList.toggle('hidden',n===0);}catch{}}
+async function renderLeaves(){
+  const pendEl=document.getElementById('leavePending'),histEl=document.getElementById('leaveHistory');
+  try{
+    const r=await api('/api/admin/leaves');const rows=r.rows||[],pending=rows.filter(x=>x.status==='pending');
+    pendEl.innerHTML=pending.length?pending.map(x=>`<div class="log-row"><div><div class="m-name">${esc(x.name)}</div><div class="m-id">${esc(x.eid)} · ${esc(x.dept)}</div></div><div class="log-task"><strong>${fmtLeaveRange(x.fromDate,x.toDate)}</strong>${leaveTag(x.leaveType)}<br>${esc(x.reason)}</div><div class="log-time">Sent<br>${fmtDay(x.createdAt.slice(0,10))}</div><div class="request-actions"><button class="btn btn-sm btn-accept" data-act="approved" data-id="${x.id}">Approve</button><button class="btn btn-sm btn-deny" data-act="denied" data-id="${x.id}">Deny</button></div></div>`).join(''):'<div class="empty">No pending leave requests.</div>';
+    pendEl.querySelectorAll('[data-act]').forEach(b=>b.onclick=async()=>{b.disabled=true;try{await api('/api/admin/leaves/'+b.dataset.id,{method:'PATCH',body:JSON.stringify({status:b.dataset.act})});showToast(b.dataset.act==='approved'?'Leave approved':'Leave denied');await loadState();renderMembers();renderReport();}catch(e){showToast(e.message);}renderLeaves();});
+    histEl.innerHTML=`<thead><tr><th>Name</th><th>Type</th><th>Dates</th><th>Reason</th><th>Status</th></tr></thead><tbody>${rows.length?rows.map(x=>`<tr><td>${esc(x.name)}</td><td>${leaveTag(x.leaveType)}</td><td>${fmtLeaveRange(x.fromDate,x.toDate)}</td><td style="max-width:320px;white-space:pre-wrap;word-break:break-word">${esc(x.reason)}</td><td><span class="status-dot ${x.status}"><span class="d"></span>${LOG_LABEL[x.status]}</span></td></tr>`).join(''):'<tr><td colspan="5" style="text-align:center;padding:20px">No leave requests yet.</td></tr>'}</tbody>`;
+    const n=pending.length,bd=document.getElementById('leaveBadge');bd.textContent=n;bd.classList.toggle('hidden',n===0);
+  }catch(e){pendEl.innerHTML=`<div class="empty">${esc(e.message)}</div>`;}
+}
+
+/* ---------- Member calendar ---------- */
+function shiftMonth(mo,delta){const[y,m]=mo.split('-').map(Number);const d=new Date(y,m-1+delta,1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+async function openCalendar(id,month){
+  const m=members.find(x=>x.id===id);if(!m)return;
+  month=month||ymd(new Date()).slice(0,7);
+  openModal(`<h2>${esc(m.name)}</h2><div class="section-sub">${esc(m.eid)} · ${esc(m.dept)}</div><div class="empty" style="padding:30px">Loading calendar…</div>`);
+  document.getElementById('modalBox').classList.add('wide');
+  let r;try{r=await api('/api/admin/members/'+encodeURIComponent(id)+'/calendar?month='+month);}catch(e){openModal(`<h2>${esc(m.name)}</h2><div class="auth-error" style="display:block">${esc(e.message)}</div><div class="modal-actions"><button class="btn btn-outline" id="mCancel">Close</button></div>`);document.getElementById('mCancel').onclick=closeModal;return;}
+  const [y,mo]=month.split('-').map(Number),daysIn=new Date(y,mo,0).getDate(),startDow=new Date(y,mo-1,1).getDay(),today=ymd(new Date());
+  const att={},mk={},lg={},leaveDays={};
+  r.attendance.forEach(a=>att[a.date]=a);r.marks.forEach(k=>mk[k.date]=k);r.logs.forEach(l=>lg[l.date]=l);
+  r.leaves.forEach(l=>{for(let d=1;d<=daysIn;d++){const ds=month+'-'+String(d).padStart(2,'0');if(ds>=l.fromDate&&ds<=l.toDate)leaveDays[ds]=l;}});
+  let present=0,absent=0,comp=0,site=0,leave=0,totMin=0,otMin=0,cells='';
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>cells+=`<div class="cal-dow">${d}</div>`);
+  for(let i=0;i<startDow;i++)cells+='<div class="cal-cell empty"></div>';
+  for(let d=1;d<=daysIn;d++){
+    const ds=month+'-'+String(d).padStart(2,'0'),dow=new Date(y,mo-1,d).getDay(),a0=att[ds],a=(a0&&a0.counted!==false)?a0:null,k=mk[ds],lv=leaveDays[ds],l=lg[ds];
+    let cls=dow===0?'sun':'',body='',pa='',ws=[];
+    if(dow===0)ws.push('Sunday');
+    if(a&&a.checkIn){
+      const w=workedMin(a.checkIn,a.checkOut);
+      if(w!=null){present++;totMin+=w;const ot=Math.max(0,w-OT_AFTER_MIN);otMin+=ot;cls='present';pa='p';if(ot>0)ws.push('OT '+hrs(ot)+'h');body+=`<div>${fmt12(a.checkIn)}–${fmt12(a.checkOut)}</div><div><b>${hrs(w)}h</b></div>`;}
+      else{present++;cls='working';pa='w';body+=`<div>In ${fmt12(a.checkIn)}</div><div>No check-out</div>`;}
+    }
+    if(k){if(k.type==='absent'){absent++;cls='absent';pa='a';if(k.subType==='public')ws.push('Public leave');}else if(k.type==='sitework'){site++;cls='sitework';}else{comp++;cls='compoff';}body+=`<div><span class="cal-tag ${k.type}">${MARK_LABEL[k.type]}${k.type==='absent'&&SUB_LABEL[k.subType]?' · '+SUB_LABEL[k.subType]:''}</span></div>${k.note?`<div title="${esc(k.note)}">${esc(k.note.slice(0,24))}</div>`:''}`;}
+    if(lv&&!(a&&a.checkIn)&&!k){leave++;cls='leave';body+=`<div><span class="cal-tag leave">${lv.leaveType==='emergency'?'Emergency leave':'Planned leave'}</span></div><div title="${esc(lv.reason)}">${esc(lv.reason.slice(0,24))}</div>`;}
+    else if(lv&&!k){leave++;body+=`<div><span class="cal-tag leave">${lv.leaveType==='emergency'?'Emergency leave':'Planned leave'}</span></div>`;}
+    if(!k&&!lv&&!(a0&&a0.checkIn)&&dow!==0&&ds<today&&ds>=(r.member.createdAt||'0000-00-00')){absent++;cls='absent';pa='a';body+=`<div><span class="cal-tag absent">Absent</span></div><div>No check-in</div>`;}
+    if(!k&&!lv&&!(a0&&a0.checkIn)&&dow!==0&&ds===today&&ds>=(r.member.createdAt||'0000-00-00')){body+=`<div><span class="cal-tag leave">Waiting response</span></div><div>No check-in yet</div>`;}
+    if(a0&&!a&&!(l&&l.status==='denied'))body+=`<div class="cal-nolog">Awaiting approval</div>`;
+    if(l&&l.status==='denied')body+=`<div class="cal-nolog">Log not provided</div>`;
+    const paTxt={p:'Present',a:'Absent',w:'Working'}[pa]||'';
+    cells+=`<div class="cal-cell ${cls} ${ds===today?'today':''}"><div class="dn">${d}${paTxt?`<span class="cal-pa ${pa}">${paTxt}</span>`:''}</div>${body}${ws.length?`<span class="cal-ws"><small>Work side</small>${esc(ws.join(' · '))}</span>`:''}</div>`;
+  }
+  const label=new Date(y,mo-1,1).toLocaleDateString(undefined,{month:'long',year:'numeric'});
+  openModal(`<h2>${esc(r.member.name)}</h2><div class="section-sub">${esc(r.member.eid)} · ${esc(r.member.dept)}</div>
+    <div class="cal-top"><button class="btn btn-outline btn-sm" id="calPrev">‹ Prev</button><div class="cal-title">${label}</div><button class="btn btn-outline btn-sm" id="calNext">Next ›</button></div>
+    <div class="cal-sum"><div><b>${present}</b>Days present</div><div><b>${absent}</b>Absent</div><div><b>${comp}</b>Comp-off</div><div><b>${site}</b>Site work</div><div><b>${leave}</b>Leave days</div><div><b>${hrs(totMin)}</b>Total hours</div><div><b>${hrs(otMin)}</b>OT hours</div></div>
+    <div class="cal-grid">${cells}</div>
+    <div class="cal-legend"><span><i style="background:#FFF3B0"></i>Working</span><span><i style="background:var(--green-bg)"></i>Present</span><span><i style="background:var(--red-bg)"></i>Absent</span><span><i style="background:var(--accent-bg)"></i>Comp-off</span><span><i style="background:#DBEAFE"></i>Site work</span><span><i style="background:#FFF1CC"></i>Leave</span><span><i style="background:#DBEAFE"></i>Work side (Sunday / Public leave / OT)</span></div>
+    <div class="modal-actions"><button class="btn btn-outline" id="mCancel">Close</button></div>`);
+  document.getElementById('modalBox').classList.add('wide');
+  document.getElementById('mCancel').onclick=closeModal;
+  document.getElementById('calPrev').onclick=()=>openCalendar(id,shiftMonth(month,-1));
+  document.getElementById('calNext').onclick=()=>openCalendar(id,shiftMonth(month,1));
+}
+
+/* ---------- Absent / Comp-off ---------- */
+const MARK_LABEL={absent:'Absent',compoff:'Comp-off',sitework:'Site work'};
+const SUB_LABEL={public:'Public leave',annual:'Annual leave'};
+async function openMarkModal(id,defType){
+  const m=members.find(x=>x.id===id);if(!m)return;
+  defType=defType||'absent';
+  openModal(`<h2>${defType==='sitework'?'Site work':'Absent / Comp-off / Site work'}</h2><div class="section-sub">${esc(m.name)} · ${esc(m.eid)}</div><div class="auth-error" id="modalError"></div>
+    <div class="mark-types"><label class="mark-type"><input type="radio" name="mkType" value="absent">Absent</label><label class="mark-type"><input type="radio" name="mkType" value="compoff">Comp-off</label><label class="mark-type"><input type="radio" name="mkType" value="sitework">Site work</label></div>
+    <div class="field mark-sub" id="mkSubBox"><label>Absent reason</label><select id="mkSub"><option value="annual">Annual leave</option><option value="public">Public leave</option></select></div>
+    <div class="field"><label>Date</label><input type="date" id="mkDate" value="${todayStr}"></div>
+    <div class="field"><label>Note <span style="font-weight:400">(optional)</span></label><input type="text" id="mkNote" maxlength="200" placeholder="e.g. Worked last Sunday"></div>
+    <div class="modal-actions"><button class="btn btn-outline" id="mCancel">Close</button><button class="btn btn-blue" id="mkSave">Save mark</button></div>
+    <div class="modal-section"><div class="section-title" style="font-size:13.5px">Recent marks</div><div id="mkList"><div class="empty" style="padding:12px">Loading…</div></div></div>`);
+  document.getElementById('mCancel').onclick=closeModal;
+  const dr=document.querySelector('input[name="mkType"][value="'+defType+'"]');if(dr)dr.checked=true;
+  const syncSub=()=>{const t=document.querySelector('input[name="mkType"]:checked').value;document.getElementById('mkSubBox').style.display=t==='absent'?'':'none';document.getElementById('mkNote').placeholder=t==='sitework'?'e.g. Site name / customer location':'e.g. Worked last Sunday';};
+  document.querySelectorAll('input[name="mkType"]').forEach(r=>r.onchange=syncSub);syncSub();
+  document.getElementById('mkSave').onclick=async()=>{
+    const type=document.querySelector('input[name="mkType"]:checked').value,date=document.getElementById('mkDate').value,subType=type==='absent'?document.getElementById('mkSub').value:'';
+    if(!date)return modalErr('Choose a date.');
+    try{await api('/api/admin/marks',{method:'POST',body:JSON.stringify({memberId:id,date,type,subType,note:document.getElementById('mkNote').value.trim()})});await loadState();renderMembers();renderReport();showToast(MARK_LABEL[type]+' saved');loadMarkList(id);document.getElementById('mkNote').value='';}
+    catch(e){modalErr(e.message);}
+  };
+  loadMarkList(id);
+}
+async function loadMarkList(id){
+  const box=document.getElementById('mkList');if(!box)return;
+  try{
+    const r=await api('/api/admin/marks?memberId='+encodeURIComponent(id));const list=r.marks||[];
+    box.innerHTML=list.length?list.map(x=>`<div class="admin-row"><div><div class="m-name">${fmtDay(x.date)} <span class="status-dot ${x.type}" style="margin-left:6px"><span class="d"></span>${MARK_LABEL[x.type]}${x.type==='absent'&&SUB_LABEL[x.subType]?' · '+SUB_LABEL[x.subType]:''}</span></div>${x.note?`<div class="m-id">${esc(x.note)}</div>`:''}</div><button class="link-btn" data-rm="${x.id}">Remove</button></div>`).join(''):'<div class="empty" style="padding:12px">No marks yet.</div>';
+    box.querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{try{await api('/api/admin/marks/'+b.dataset.rm,{method:'DELETE'});await loadState();renderMembers();renderReport();showToast('Mark removed');loadMarkList(id);}catch(e){showToast(e.message);}});
+  }catch(e){box.innerHTML=`<div class="empty" style="padding:12px">${esc(e.message)}</div>`;}
+}
+/* ---------- Member-wise attendance log ---------- */
+let attLogMonth=null,attLogData=null;
+const ATT_LABEL={P:'Present',A:'Absent',PL:'Planned leave',EL:'Emergency leave',CO:'Comp-off',SW:'Site work',W:'Awaiting approval',WR:'Waiting response'};
+async function renderAttLog(month){
+  const box=document.getElementById('attLogBox');
+  month=month||attLogMonth||ymd(new Date()).slice(0,7);attLogMonth=month;
+  box.innerHTML='<div class="empty">Loading…</div>';
+  try{attLogData=await api('/api/admin/attendance-log?month='+month);drawAttLog();}
+  catch(e){box.innerHTML=`<div class="empty">${esc(e.message)}</div>`;}
+}
+function drawAttLog(){
+  const r=attLogData,box=document.getElementById('attLogBox');if(!r)return;
+  const [y,mo]=r.month.split('-').map(Number),q=(document.getElementById('attSearch').value||'').trim().toLowerCase();
+  document.getElementById('attTitle').textContent=new Date(y,mo-1,1).toLocaleDateString(undefined,{month:'long',year:'numeric'});
+  const rows=r.members.filter(m=>!q||(m.name+' '+m.eid+' '+m.dept).toLowerCase().includes(q));
+  let head='<th class="att-name">Member</th>';
+  for(let d=1;d<=r.daysIn;d++){const dow=new Date(y,mo-1,d).getDay();head+=`<th class="${dow===0?'att-sun':''}">${d}<small>${'SMTWTFS'[dow]}</small></th>`;}
+  head+='<th class="att-sum">P</th><th class="att-sum">A</th><th class="att-sum">PL</th><th class="att-sum">EL</th><th class="att-sum">CO</th><th class="att-sum">SW</th>';
+  const body=rows.map(m=>{
+    let tds=`<td class="att-name"><a data-cal="${m.id}">${esc(m.name)}</a><div class="m-id">${esc(m.eid)} · ${esc(m.dept)}</div></td>`;
+    m.days.forEach((c,i)=>{const dow=new Date(y,mo-1,i+1).getDay(),ds=r.month+'-'+String(i+1).padStart(2,'0');tds+=c?`<td class="att-cell ${c.toLowerCase()}" title="${esc(m.name)} · ${ds} · ${ATT_LABEL[c]}">${c==='W'||c==='WR'?'…':c}</td>`:`<td class="${dow===0?'att-sun':''}"></td>`;});
+    const t=m.totals;tds+=`<td class="att-sum">${t.P}</td><td class="att-sum">${t.A}</td><td class="att-sum">${t.PL}</td><td class="att-sum">${t.EL}</td><td class="att-sum">${t.CO}</td><td class="att-sum">${t.SW||0}</td>`;
+    return `<tr>${tds}</tr>`;
+  }).join('');
+  box.innerHTML=rows.length?`<div class="att-wrap"><table class="att-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`:'<div class="empty">No members found.</div>';
+  box.querySelectorAll('[data-cal]').forEach(a=>a.onclick=()=>openCalendar(a.dataset.cal,r.month));
+}
+function exportAttLogCSV(){
+  const r=attLogData;if(!r){showToast('Open the Attendance Log first');return;}
+  const dates=Array.from({length:r.daysIn},(_,i)=>r.month+'-'+String(i+1).padStart(2,'0'));
+  downloadCSV('attendance-log-'+r.month+'.csv',[['Name','Worker ID','Department',...dates,'Present','Absent','Planned leave','Emergency leave','Comp-off','Site work'],...r.members.map(m=>[m.name,m.eid,m.dept,...m.days.map(c=>c==='W'?'':(ATT_LABEL[c]||'')),m.totals.P,m.totals.A,m.totals.PL,m.totals.EL,m.totals.CO,m.totals.SW||0])]);
+  showToast('CSV downloaded');
+}
+async function renderActivity(){
+  const t=document.getElementById('activityTable');
+  try{const r=await api('/api/activity?days=90');const rows=(r.rows||[]).map(uc);
+    t.innerHTML=`<thead><tr><th>Date</th><th>Name</th><th>ID</th><th>Department</th><th>Check in</th><th>Check out</th><th>Hours</th><th>OT</th><th>Daily log</th><th>Status</th></tr></thead><tbody>${rows.length?rows.map(x=>{const h=hoursCols(x.checkIn,x.checkOut);return `<tr><td>${esc(x.date)}</td><td>${esc(x.name)}</td><td>${esc(x.eid)}</td><td>${esc(x.dept)}</td><td>${fmt12(x.checkIn)}</td><td>${fmt12(x.checkOut)}</td><td>${h[0]||'—'}</td><td>${h[2]&&+h[2]>0?`<strong style="color:var(--accent-dark)">${h[2]}</strong>`:(h[2]||'—')}</td><td style="max-width:240px;white-space:pre-wrap;word-break:break-word">${x.logStatus==='denied'?'<span style="color:var(--red);font-weight:600">'+NOT_PROVIDED+'</span>':(x.task?esc(x.task):'<span style="color:var(--ink-soft)">—</span>')}</td><td>${x.status?esc(x.status):`<span style="color:var(--ink-soft)">${x.logStatus==='denied'?'Not approved':'Awaiting approval'}</span>`}</td></tr>`}).join(''):'<tr><td colspan="10" style="text-align:center;padding:20px">No activity recorded yet.</td></tr>'}</tbody>`;
+  }catch(e){t.innerHTML=`<tbody><tr><td>${esc(e.message)}</td></tr></tbody>`;}
+}
+const OT_AFTER_MIN=9*60;
+function workedMin(ci,co){if(!ci||!co)return null;const[a,b]=ci.split(':').map(Number),[c,d]=co.split(':').map(Number);let m=(c*60+d)-(a*60+b);if(m<0)m+=1440;return m;}
+function hrs(min){return(min/60).toFixed(2);}
+function hoursCols(ci,co){const w=workedMin(ci,co);return w==null?['','','']:[hrs(w),hrs(Math.min(w,OT_AFTER_MIN)),hrs(Math.max(0,w-OT_AFTER_MIN))];}
+function uc(x){return x.counted===false?{...x,checkIn:null,checkOut:null,status:''}:x;}
+function logLabel(st){return st==='denied'?NOT_PROVIDED:(st?LOG_LABEL[st]:'No log');}
+function totalsRow(label,cols,rows){let w=0,r=0,o=0;rows.forEach(x=>{const m=workedMin(x.checkIn,x.checkOut);if(m!=null){w+=m;r+=Math.min(m,OT_AFTER_MIN);o+=Math.max(0,m-OT_AFTER_MIN);}});const row=Array(cols).fill('');row[0]=label;return[row,[hrs(w),hrs(r),hrs(o)]];}
+function csvCell(v){let t=String(v??'');if(typeof v==='string'&&/^[=+\-@\t\r]/.test(t))t="'"+t;return '"'+t.replace(/"/g,'""')+'"';}
+function downloadCSV(filename,rows){const csv='\uFEFF'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
+async function exportCSV(){const r=await api('/api/report/today');const rows=r.rows||[];downloadCSV('attendance-'+r.date+'.csv',[['Date','Name','Worker ID','Department','Check in','Check out','Status','Hours Worked','Regular Hours (max 9)','OT Hours (over 9)','Daily Log Task','Daily Log Status'],...rows.map(x=>{const u=uc(x);return [r.date,x.name,x.eid,x.dept,fmt12(u.checkIn),fmt12(u.checkOut),x.status,...hoursCols(u.checkIn,u.checkOut),x.task||'',logLabel(x.logStatus)];})]);showToast('CSV downloaded');}
+async function exportActivityCSV(){const r=await api('/api/activity?days=90');const rows=(r.rows||[]).map(uc);const[,tot]=totalsRow('',1,rows);downloadCSV('daily-activity.csv',[['Date','Name','Worker ID','Department','Check in','Check out','Status','Hours Worked','Regular Hours (max 9)','OT Hours (over 9)','Daily Log Task','Daily Log Status'],...rows.map(x=>[x.date,x.name,x.eid,x.dept,fmt12(x.checkIn),fmt12(x.checkOut),x.status,...hoursCols(x.checkIn,x.checkOut),x.task||'',logLabel(x.logStatus)]),['TOTAL','','','','','','',...tot,'','']]);showToast('CSV downloaded');}
+function renderChips(){let working=0,done=0;members.forEach(m=>{const s=statusOf(todayAttendance[m.id]).key;if(s==='working')working++;if(s==='done')done++;});document.getElementById('chipRow').innerHTML=`<div class="chip"><div class="chip-ico" style="background:var(--accent-bg)"></div><div><div class="chip-label">Total members</div><div class="chip-value">${members.length}</div></div></div><div class="chip"><div class="chip-ico" style="background:#FFE766"></div><div><div class="chip-label">Currently working</div><div class="chip-value">${working}</div></div></div><div class="chip"><div class="chip-ico" style="background:var(--grey-bg)"></div><div><div class="chip-label">Checked out</div><div class="chip-value">${done}</div></div></div>`;}
+function statusFor(m){const rec=todayAttendance[m.id];if((!rec||!rec.checkIn)&&marks[m.id])return{key:marks[m.id],label:MARK_LABEL[marks[m.id]]};if((!rec||!rec.checkIn)&&onLeave.includes(m.id))return{key:'leave',label:'On leave'};return statusOf(rec);}
+function statusOf(rec){if(!rec||!rec.checkIn)return{key:'notin',label:'Not checked in'};if(rec.checkIn&&!rec.checkOut)return{key:'working',label:'Working'};return{key:'done',label:'Checked out'};}
+function renderMembers(){
+  document.getElementById('memberDateLabel').textContent=new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
+  const q=(document.getElementById('searchInput').value||'').toLowerCase(),list=document.getElementById('memberList');
+  const filtered=members.filter(m=>(m.name+' '+m.dept+' '+m.eid).toLowerCase().includes(q));
+  list.innerHTML=filtered.length?filtered.map(m=>{const rec=todayAttendance[m.id]||{},st=statusFor(m);return `<div class="member-row"><div class="m-who" data-act="cal" data-id="${m.id}" style="cursor:pointer" title="View calendar"><div class="m-avatar" style="background:${colorFor(m.id)}">${initials(m.name)}</div><div><div class="m-name">${esc(m.name)}</div><div class="m-id">${esc(m.eid)}</div></div></div><div class="m-dept">${esc(m.dept)}</div><div><div class="m-time-label">Check in</div><div class="m-time">${fmt12(rec.checkIn)}</div></div><div><span class="status-dot ${st.key}"><span class="d"></span>${st.label}</span></div><div class="m-actions"><button class="btn btn-outline btn-sm" data-act="cal" data-id="${m.id}">Calendar</button>${currentAdmin?.role==='super'?`<button class="btn btn-outline btn-sm" data-act="edit" data-id="${m.id}">Edit</button>`:''}<button class="btn btn-outline btn-sm" data-act="mark" data-id="${m.id}">Absent / Comp-off</button><button class="btn btn-outline btn-sm" data-act="site" data-id="${m.id}">Site work</button><button class="icon-del-btn" data-act="del" data-id="${m.id}">Remove</button></div></div>`}).join(''):'<div class="empty">No members yet — add one above to get started.</div>';
+  list.querySelectorAll('[data-act="cal"]').forEach(b=>b.onclick=()=>openCalendar(b.dataset.id));list.querySelectorAll('[data-act="edit"]').forEach(b=>b.onclick=()=>openEditMember(b.dataset.id));list.querySelectorAll('[data-act="mark"]').forEach(b=>b.onclick=()=>openMarkModal(b.dataset.id));list.querySelectorAll('[data-act="site"]').forEach(b=>b.onclick=()=>openMarkModal(b.dataset.id,'sitework'));list.querySelectorAll('[data-act="del"]').forEach(b=>b.onclick=()=>removeMember(b.dataset.id));
+}
+const RSTAT_CLASS={'Waiting response':'pending','Present':'done','Absent':'absent','Comp-off':'compoff','Site work':'sitework','Leave':'leave','Sunday off':'notin'};
+function reportStatus(m){const rec=todayAttendance[m.id];if(rec&&rec.checkIn)return'Present';const mk=marks[m.id];if(mk==='compoff')return'Comp-off';if(mk==='sitework')return'Site work';if(mk==='absent')return'Absent';if(onLeave.includes(m.id))return'Leave';return new Date(todayStr+'T00:00:00').getDay()===0?'Sunday off':'Waiting response';}
+function renderReport(){document.getElementById('reportTable').innerHTML=`<thead><tr><th>Name</th><th>ID</th><th>Department</th><th>Check in</th><th>Check out</th><th>Status</th></tr></thead><tbody>${members.map(m=>{const r=todayAttendance[m.id]||{},s=reportStatus(m);return `<tr><td>${esc(m.name)}</td><td>${esc(m.eid)}</td><td>${esc(m.dept)}</td><td>${fmt12(r.checkIn)}</td><td>${fmt12(r.checkOut)}</td><td><span class="status-dot ${RSTAT_CLASS[s]||'notin'}"><span class="d"></span>${s}</span></td></tr>`}).join('')||'<tr><td colspan="6">No members yet.</td></tr>'}</tbody>`;}
+
+let workerHost='workerMain';
+async function renderWorker(host){
+  if(host)workerHost=host;
+  const m=currentWorker,rec=todayAttendance[m.id]||{},st=statusOf(rec);
+  let history=[];try{const r=await api('/api/worker/history?days=14');history=r.rows||[];}catch{}
+  let log=null,logErr='';try{const r=await api('/api/worker/daily-log');log=r.log;}catch(e){logErr=e.message;}
+  let markToday=null,leaves=[],onLeaveToday=false,leaveErr='';try{const r=await api('/api/worker/leaves');leaves=r.leaves||[];onLeaveToday=!!r.onLeaveToday;markToday=r.markToday||null;}catch(e){leaveErr=e.message;}
+  const today0=ymd(new Date()),tomorrow0=ymd(new Date(Date.now()+86400000));
+  const leaveBanner=leaveErr?`<div class="log-banner denied">${esc(leaveErr)}</div>`:markToday?`<div class="log-banner denied">Your admin marked you ${MARK_LABEL[markToday]} today. Check-in is disabled.</div>`:onLeaveToday?'<div class="log-banner approved">You are on approved leave today. Check-in is disabled.</div>':'';
+  const leaveCard=`<div class="card leave-card"><div class="section-title">Leave</div><div class="section-sub">Choose the type, pick the dates, add a reason and send it to your admin.</div>${leaveBanner}<div class="leave-types"><label class="leave-type"><input type="radio" name="lvType" value="planned" checked>Planned leave</label><label class="leave-type"><input type="radio" name="lvType" value="emergency">Emergency leave</label></div><div class="leave-type-hint" id="lvHint">Planned leave must be submitted at least one day before it starts.</div><div class="leave-dates"><div><label for="lvFrom">From</label><input type="date" id="lvFrom" min="${tomorrow0}" value="${tomorrow0}"></div><div><label for="lvTo">To</label><input type="date" id="lvTo" min="${tomorrow0}" value="${tomorrow0}"></div></div><div class="leave-label" style="margin-top:10px">Reason</div><textarea id="lvReason" maxlength="500" placeholder="Why do you need leave?"></textarea><button class="btn btn-blue" id="lvSubmit" style="width:100%">Send leave request</button>${leaves.length?`<div class="modal-section"><div class="section-title" style="font-size:13.5px">My leave requests</div>${leaves.map(l=>`<div class="leave-item"><div><div class="leave-item-dates">${fmtLeaveRange(l.fromDate,l.toDate)}${leaveTag(l.leaveType)}</div><div class="leave-item-reason">${esc(l.reason)}</div></div><div class="leave-item-right"><span class="status-dot ${l.status}"><span class="d"></span>${LOG_LABEL[l.status]}</span>${l.status==='pending'?`<button class="link-btn" data-cancel="${l.id}">Cancel</button>`:''}</div></div>`).join('')}</div>`:''}</div>`;
+  const logStatus=log?.status||'none',canOut=!!(rec.checkIn&&!rec.checkOut);
+  const LOCK_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+  const lockHint='';
+  const formLocked=!rec.checkIn||logStatus==='pending'||logStatus==='approved';
+  const banner=logErr?`<div class="log-banner denied">${esc(logErr)}</div>`:logStatus==='pending'?'<div class="log-banner pending">Request sent — waiting for admin approval. Today is counted as present once it is approved.</div>':logStatus==='approved'?'<div class="log-banner approved">Approved by admin — your daily log is saved.</div>':logStatus==='denied'?'<div class="log-banner denied">Your admin denied this log. It is recorded as "Daily log not provided". You can update it and send again.</div>':!rec.checkIn?'<div class="log-banner pending">Check in first, then send your daily log.</div>':'';
+  const logCard=`<div class="card log-card"><div class="manual-head"><div class="section-title">Daily log</div>${log?`<span class="status-dot ${log.status}"><span class="d"></span>${LOG_LABEL[log.status]}</span>`:''}</div><div class="section-sub">Write today's task, then press <b>Check out now</b>. The request goes to your admin, and today counts as present only after the admin approves it.</div>${banner}<textarea id="logTask" maxlength="1000" placeholder="What did you work on today?" ${formLocked?'disabled':''}>${esc(log?.task||'')}</textarea><button class="btn btn-blue" id="logSubmit" style="width:100%" ${formLocked||!rec.checkOut?'disabled':''}>${!rec.checkOut&&logStatus==='none'?'Sent when you check out':logStatus==='pending'?'Waiting for approval':logStatus==='approved'?'Approved':logStatus==='denied'?'Send request again':'Send request'}</button></div>`;
+  clearInterval(window._logPoll);
+  if(logStatus==='pending')window._logPoll=setInterval(async()=>{try{const r=await api('/api/worker/daily-log');if(r.log?.status!=='pending'){clearInterval(window._logPoll);await renderWorker();showToast(r.log?.status==='approved'?'Your daily log was approved':'Your daily log was denied');}}catch{}},8000);
+  document.getElementById(workerHost).innerHTML=`<div class="card worker-card"><div class="worker-avatar-lg" style="background:${colorFor(m.id)}">${initials(m.name)}</div><div class="worker-name">${esc(m.name)}</div><div class="worker-role">${esc(m.dept)} · ${esc(m.eid)}</div><span class="status-dot ${st.key}"><span class="d"></span>${st.label}</span><div class="worker-metrics"><div class="worker-metric"><div class="worker-metric-label">Checked in</div><div class="worker-metric-value">${fmt12(rec.checkIn)}</div></div><div class="worker-metric"><div class="worker-metric-label">Checked out</div><div class="worker-metric-value">${fmt12(rec.checkOut)}</div></div></div><div class="worker-actions"><button class="btn btn-blue btn-lg" id="wCheckIn" ${rec.checkIn||onLeaveToday||markToday?'disabled':''}>Check in now</button><button class="btn btn-outline btn-lg" id="wCheckOut" ${canOut?'':'disabled'}>Check out now</button></div>${lockHint}</div>${logCard}${leaveCard}<div class="card manual-card"><div class="manual-head"><div class="section-title">Manual time entry</div></div><div class="manual-fields"><select id="manualType"><option value="checkIn">Check-in</option><option value="checkOut">Check-out</option></select><input type="date" id="manualDate" value="${todayStr}"><input type="time" id="manualTime" value="${nowHM()}"></div><button class="btn btn-blue" id="manualSubmit" style="width:100%">Save manual entry</button></div><div class="card activity-card"><div class="manual-head"><div class="section-title">Daily activity</div><button class="btn btn-outline btn-sm" id="workerDownloadBtn">Download report</button></div><div class="section-sub">Your check-in and check-out history.</div>${history.length?history.map(h=>`<div class="activity-row"><div class="activity-date">${esc(h.date)}</div><div class="activity-times"><span>In: ${fmt12(h.checkIn)}</span><span>Out: ${fmt12(h.checkOut)}</span>${h.counted===false?`<span style="color:var(--red);font-weight:600">${h.logStatus==='denied'?'Not approved':'Awaiting admin approval'}</span>`:''}</div></div>`).join(''):'<div class="empty">No activity recorded yet.</div>'}</div>`;
+  document.getElementById('wCheckIn').onclick=async()=>{await quickCheckIn(m.id);await renderWorker();};document.getElementById('wCheckOut').onclick=async()=>{const task=document.getElementById('logTask').value.trim();if(logStatus!=='approved'&&task.length<3){showToast('Write your daily log first, then check out');document.getElementById('logTask').focus();return;}await quickCheckOut(m.id,task);await renderWorker();};
+  const lvKind=()=>document.querySelector('input[name="lvType"]:checked').value;document.querySelectorAll('input[name="lvType"]').forEach(r=>r.onchange=()=>{const em=lvKind()==='emergency',min=em?today0:tomorrow0,f=document.getElementById('lvFrom'),t=document.getElementById('lvTo');f.min=t.min=min;if(f.value<min)f.value=min;if(t.value<min)t.value=min;document.getElementById('lvHint').textContent=em?'Emergency leave is for urgent situations and can start today.':'Planned leave must be submitted at least one day before it starts.';});
+  document.getElementById('lvSubmit').onclick=async()=>{const leaveType=lvKind(),fromDate=document.getElementById('lvFrom').value,toDate=document.getElementById('lvTo').value,reason=document.getElementById('lvReason').value.trim();if(!fromDate||!toDate){showToast('Choose the leave dates');return;}if(leaveType==='planned'&&fromDate<tomorrow0){showToast('Planned leave must be submitted at least one day before it starts');return;}if(toDate<fromDate){showToast('End date cannot be before start date');return;}if(reason.length<3){showToast('Please enter a reason');return;}try{await api('/api/worker/leaves',{method:'POST',body:JSON.stringify({fromDate,toDate,reason,leaveType})});showToast((leaveType==='emergency'?'Emergency':'Planned')+' leave request sent to admin');}catch(e){showToast(e.message);}await renderWorker();};
+  document.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=async()=>{try{await api('/api/worker/leaves/'+b.dataset.cancel,{method:'DELETE'});showToast('Leave request cancelled');}catch(e){showToast(e.message);}await renderWorker();});
+  document.getElementById('logSubmit').onclick=async()=>{const task=document.getElementById('logTask').value.trim();if(task.length<3){showToast('Please describe your task');return;}try{await api('/api/worker/daily-log',{method:'POST',body:JSON.stringify({task})});showToast('Request sent to admin');}catch(e){showToast(e.message);}await renderWorker();};
+  document.getElementById('manualSubmit').onclick=async()=>{const ok=await manualEntry(m.id,document.getElementById('manualType').value,document.getElementById('manualDate').value,document.getElementById('manualTime').value);if(ok)await renderWorker();};
+  document.getElementById('workerDownloadBtn').onclick=async()=>{try{const r=await api('/api/worker/history?days=365');const rows=(r.rows||[]).map(uc);const[,tot]=totalsRow('',1,rows);downloadCSV((m.name.replace(/\s+/g,'-'))+'-report.csv',[['Date','Check in','Check out','Hours Worked','Regular Hours (max 9)','OT Hours (over 9)','Daily Log Task','Daily Log Status'],...rows.map(x=>[x.date,fmt12(x.checkIn),fmt12(x.checkOut),...hoursCols(x.checkIn,x.checkOut),x.task||'',logLabel(x.logStatus)]),['TOTAL','','',...tot,'','']]);showToast('Report downloaded');}catch(e){showToast(e.message);}};
+}
+
+
+/* ---------- Link admin member / My worker dashboard ---------- */
+let linkData=null;
+function applyLinkNav(){document.getElementById('myWorkerNavLink').classList.toggle('hidden',!(linkData&&linkData.linked));}
+async function refreshLink(){if(!currentAdmin)return;try{linkData=await api('/api/admin/link-member');}catch{linkData=null;}applyLinkNav();}
+async function renderLinkMember(){
+  const list=document.getElementById('linkList'),cur=document.getElementById('linkCurrent');
+  list.innerHTML='<div class="empty">Loading…</div>';
+  await refreshLink();
+  if(!linkData){list.innerHTML='<div class="empty">Could not load members. Try again.</div>';return;}
+  const q=(document.getElementById('linkSearch').value||'').trim().toLowerCase(),L=linkData.linked;
+  cur.innerHTML=L?`<div class="card" style="padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><div class="section-sub" style="margin:0">Linked member</div><div class="m-name">${esc(L.name)} <span class="m-id" style="display:inline">· ${esc(L.eid)} · ${esc(L.dept)}</span></div></div><button class="btn btn-outline btn-sm" id="unlinkBtn">Unlink</button></div>`:'';
+  if(L)document.getElementById('unlinkBtn').onclick=async()=>{try{await api('/api/admin/link-member',{method:'DELETE'});if(document.querySelector('.nav-link.active')?.dataset.view==='myworker')document.querySelector('.nav-link[data-view="linkmember"]').click();showToast('Member unlinked');await renderLinkMember();}catch(e){showToast(e.message);}};
+  const rows=linkData.members.filter(m=>!q||(m.name+' '+m.eid+' '+m.dept).toLowerCase().includes(q));
+  list.innerHTML=rows.length?rows.map(m=>{const mine=L&&L.id===m.id;return `<div class="member-row" style="grid-template-columns:1.8fr 1fr auto"><div class="m-who"><div class="m-avatar" style="background:${colorFor(m.id)}">${initials(m.name)}</div><div><div class="m-name">${esc(m.name)}</div><div class="m-id">${esc(m.eid)}</div></div></div><div class="m-dept">${esc(m.dept)}</div><div class="m-actions">${mine?'<span class="status-dot done"><span class="d"></span>Linked</span>':m.linkedToOther?'<span class="m-dept">Linked to another admin</span>':`<button class="btn btn-blue btn-sm" data-link="${m.id}">Select</button>`}</div></div>`;}).join(''):'<div class="empty">No members found.</div>';
+  list.querySelectorAll('[data-link]').forEach(b=>b.onclick=async()=>{try{await api('/api/admin/link-member',{method:'POST',body:JSON.stringify({memberId:b.dataset.link})});showToast('Linked. Open "My Worker Dashboard"');await renderLinkMember();}catch(e){showToast(e.message);}});
+}
+async function renderMyWorker(){
+  const box=document.getElementById('myWorkerMain');
+  if(!(linkData&&linkData.linked)){box.innerHTML='<div class="card"><div class="empty">No member linked yet. Use "Link Admin Member" first.</div></div>';return;}
+  currentWorker=linkData.linked;
+  await loadState();
+  await renderWorker('myWorkerMain');
+}
+document.getElementById('linkSearch').oninput=()=>{if(linkData)renderLinkMember();};
+
+document.getElementById('goAdmin').onclick=openAdminAuth;document.getElementById('goWorker').onclick=openWorkerAuth;
+document.getElementById('backFromAdmin').onclick=()=>showScreen('landingScreen');document.getElementById('backFromWorker').onclick=()=>showScreen('landingScreen');document.getElementById('backFromReset').onclick=openAdminAuth;
+document.getElementById('forgotPasswordLink').onclick=openAdminReset;document.getElementById('sendOtpBtn').onclick=sendOtp;document.getElementById('verifyOtpBtn').onclick=verifyOtp;document.getElementById('savePasswordBtn').onclick=saveNewPassword;
+document.getElementById('adminSubmit').onclick=handleAdminSubmit;document.getElementById('workerSubmit').onclick=handleWorkerSubmit;
+document.getElementById('adminLogoutBtn').onclick=logout;document.getElementById('workerLogoutBtn').onclick=logout;
+document.getElementById('addBtn').onclick=async()=>{const name=document.getElementById('newName').value.trim(),eid=document.getElementById('newEid').value.trim(),dept=document.getElementById('newDept').value.trim(),pin=document.getElementById('newPin').value.trim();if(!name||!eid||!/^\d{4}$/.test(pin)){showToast('Name, Worker ID and 4-digit PIN are required');return;}try{await addMember(name,eid,dept,pin);['newName','newEid','newDept','newPin'].forEach(id=>document.getElementById(id).value='');showToast(name+' added');}catch(e){showToast(e.message);}};
+document.getElementById('searchInput').oninput=renderMembers;document.getElementById('exportBtn').onclick=exportCSV;document.getElementById('activityExportBtn').onclick=exportActivityCSV;document.getElementById('attExportBtn').onclick=exportAttLogCSV;document.getElementById('attPrev').onclick=()=>renderAttLog(shiftMonth(attLogMonth||ymd(new Date()).slice(0,7),-1));document.getElementById('attNext').onclick=()=>renderAttLog(shiftMonth(attLogMonth||ymd(new Date()).slice(0,7),1));document.getElementById('attSearch').oninput=drawAttLog;
+document.getElementById('settingsBtn').onclick=openSettings;
+document.querySelectorAll('.nav-link').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.nav-link').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const v=btn.dataset.view;['overview','report','activity','attlog','dailylog','leave','linkmember','myworker','requests'].forEach(x=>document.getElementById('view-'+x).style.display=x===v?'block':'none');if(v!=='myworker'){clearInterval(window._logPoll);currentWorker=null;}if(v==='activity')renderActivity();if(v==='attlog')renderAttLog();if(v==='dailylog')renderDailyLogs();if(v==='leave')renderLeaves();if(v==='requests')renderRequests();if(v==='linkmember')renderLinkMember();if(v==='myworker')renderMyWorker();});
+document.getElementById('resetUsername').onkeydown=e=>{if(e.key==='Enter')sendOtp()};document.getElementById('otpInput').onkeydown=e=>{if(e.key==='Enter')verifyOtp()};document.getElementById('resetConfirmPass').onkeydown=e=>{if(e.key==='Enter')saveNewPassword()};
+document.querySelectorAll('#adminAuthScreen input').forEach(i=>i.onkeydown=e=>{if(e.key==='Enter')handleAdminSubmit()});document.getElementById('workerPin').onkeydown=e=>{if(e.key==='Enter')handleWorkerSubmit()};document.getElementById('workerEid').onkeydown=e=>{if(e.key==='Enter')handleWorkerSubmit()};
+
+const EYE_OPEN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>',EYE_OFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.9 17.9A10.6 10.6 0 0 1 12 20c-7 0-11-8-11-8a19.3 19.3 0 0 1 4.2-5.4M9.9 4.2A10.6 10.6 0 0 1 12 4c7 0 11 8 11 8a19.5 19.5 0 0 1-2.2 3.2M14.1 14.1a3 3 0 1 1-4.2-4.2"/><path d="M1 1l22 22"/></svg>';
+document.querySelectorAll('.pw-toggle').forEach(b=>{b.innerHTML=EYE_OPEN;b.onclick=()=>{const i=document.getElementById(b.dataset.target),show=i.type==='text';i.type=show?'password':'text';b.innerHTML=show?EYE_OPEN:EYE_OFF;}});
+function tickClock(){const d=new Date();const c=document.getElementById('liveClock');if(c)c.textContent=d.toLocaleTimeString(undefined,{hour12:false});const dt=document.getElementById('liveDate');if(dt)dt.textContent=d.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});}
+(async()=>{tickClock();setInterval(tickClock,1000);try{await loadState();}catch{}showScreen('landingScreen');})();
+</script>
+</body>
+</html>

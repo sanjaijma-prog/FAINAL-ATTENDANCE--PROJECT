@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: jai-maruthi-attendance
+    runtime: node
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: DATA_DIR
+        value: ./data
+      - key: TZ
+        value: Asia/Kolkata
+      - key: NODE_VERSION
+        value: 20
