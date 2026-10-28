@@ -112,7 +112,7 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 function dayDiff(a, b) { return Math.round((Date.parse(b + 'T00:00:00Z') - Date.parse(a + 'T00:00:00Z')) / 86400000); }
 function publicLeave(l) { return { id: l.id, fromDate: l.from_date, toDate: l.to_date, leaveType: l.leave_type || 'planned', reason: l.reason, status: l.status, createdAt: l.created_at, reviewedAt: l.reviewed_at }; }
 
-const MARK_LABEL = { absent: 'Absent', compoff: 'Comp-off' };
+const MARK_LABEL = { absent: 'Absent', compoff: 'Comp-off', sitework: 'Site work' };
 async function markOn(memberId, date) {
   try {
     const { data, error } = await db.from('attendance_marks').select('type').eq('member_id', memberId).eq('date', date).maybeSingle();
@@ -137,6 +137,7 @@ function isSunday(dateStr) { return new Date(dateStr + 'T00:00:00Z').getUTCDay()
 function dayStatus({ checkIn, mark, onLeave, date }) {
   if (checkIn) return 'Present';
   if (mark === 'compoff') return 'Comp-off';
+  if (mark === 'sitework') return 'Site work';
   if (mark === 'absent') return 'Absent';
   if (onLeave) return 'Leave';
   if (isSunday(date)) return 'Sunday off';
@@ -669,7 +670,7 @@ app.get('/api/admin/attendance-log', requireAdmin, async (req, res) => {
     marks.forEach(k => { markBy[k.member_id + '|' + k.date] = k; });
     leaves.forEach(l => { (leaveBy[l.member_id] = leaveBy[l.member_id] || []).push(l); });
     const rows = (members || []).map(m => {
-      const days = [], totals = { P: 0, A: 0, PL: 0, EL: 0, CO: 0, W: 0 };
+      const days = [], totals = { P: 0, A: 0, PL: 0, EL: 0, CO: 0, SW: 0, W: 0 };
       const since = m.created_at ? ymd(new Date(m.created_at)) : '0000-00-00'; // no auto-absent before the member was added
       for (let d = 1; d <= daysIn; d++) {
         const ds = month + '-' + String(d).padStart(2, '0'), dow = new Date(Date.UTC(y, mo - 1, d)).getUTCDay();
@@ -677,7 +678,7 @@ app.get('/api/admin/attendance-log', requireAdmin, async (req, res) => {
         const lv = (leaveBy[m.id] || []).find(l => l.from_date <= ds && l.to_date >= ds);
         let c = '';
         if (a?.check_in && a.counted !== false) c = 'P';
-        else if (mk) c = mk.type === 'absent' ? 'A' : 'CO';
+        else if (mk) c = mk.type === 'absent' ? 'A' : mk.type === 'sitework' ? 'SW' : 'CO';
         else if (lv) c = lv.leave_type === 'emergency' ? 'EL' : 'PL';
         else if (a?.check_in) c = 'W'; // worker's own entry still waiting for admin approval
         else if (ds < today && ds >= since && dow !== 0) c = 'A'; // no check-in on a past working day (Mon-Sat) = Absent automatically
@@ -727,6 +728,64 @@ app.delete('/api/admin/marks/:id', requireAdmin, async (req, res) => {
     await logActivity('admin', req.session.admin.id, 'mark_removed', data.member_id, { date: data.date });
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: errText(e) }); }
+});
+
+// ---------- Site work (added by the worker, admin gets a notification) ----------
+// Marks are stored in attendance_marks with type 'sitework' and marked_by = 'worker:<memberId>'.
+// "Unread" state per admin is kept in the settings table (key swSeen:<adminId>), so no extra table is needed.
+const SW_SEEN_PREFIX = 'swSeen:';
+const swMine = x => ({ id: x.id, date: x.date, note: x.note || '', createdAt: x.created_at, own: String(x.marked_by || '').startsWith('worker:') });
+app.get('/api/worker/site-work', requireWorker, async (req, res) => {
+  try {
+    const since = ymd(new Date(Date.now() - 30 * 86400000));
+    const { data, error } = await db.from('attendance_marks').select('id,date,note,created_at,marked_by').eq('member_id', req.worker.id).eq('type', 'sitework').gte('date', since).order('date', { ascending: false }).limit(30);
+    if (error) throw error;
+    res.json({ items: (data || []).map(swMine), today: ymd() });
+  } catch (e) { res.status(500).json({ error: errText(e) }); }
+});
+app.post('/api/worker/site-work', requireWorker, async (req, res) => {
+  try {
+    const date = String(req.body.date || ''), note = String(req.body.note || '').trim().slice(0, 200);
+    if (!DATE_RE.test(date)) return res.status(400).json({ error: 'Choose a valid date' });
+    if (date < ymd(new Date(Date.now() - 7 * 86400000))) return res.status(400).json({ error: 'Site work can only be added for the last 7 days or later' });
+    if (date > ymd(new Date(Date.now() + 60 * 86400000))) return res.status(400).json({ error: 'Choose a date within the next 60 days' });
+    if (note.length < 2) return res.status(400).json({ error: 'Please enter the site name / place' });
+    const att = await getOneAttendance(req.worker.id, date);
+    if (att?.check_in) return res.status(400).json({ error: 'You already have attendance on that date' });
+    if (await approvedLeaveOn(req.worker.id, date)) return res.status(400).json({ error: 'You are on approved leave on that date' });
+    const { data: ex, error: ee } = await db.from('attendance_marks').select('id,type').eq('member_id', req.worker.id).eq('date', date).maybeSingle();
+    if (ee) throw ee;
+    if (ex && ex.type !== 'sitework') return res.status(400).json({ error: `Your admin already marked you ${MARK_LABEL[ex.type] || ex.type} on that date` });
+    const row = { member_id: req.worker.id, date, type: 'sitework', note, marked_by: 'worker:' + req.worker.id };
+    let { error } = await db.from('attendance_marks').upsert({ ...row, sub_type: null }, { onConflict: 'member_id,date' });
+    if (error && /sub_type/i.test(error.message || '')) ({ error } = await db.from('attendance_marks').upsert(row, { onConflict: 'member_id,date' }));
+    if (error) throw error;
+    await logActivity('worker', req.worker.id, 'site_work_added', req.worker.id, { date, note });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: errText(e) }); }
+});
+app.delete('/api/worker/site-work/:id', requireWorker, async (req, res) => {
+  try {
+    const { data, error } = await db.from('attendance_marks').delete().eq('id', req.params.id).eq('member_id', req.worker.id).eq('type', 'sitework').like('marked_by', 'worker:%').gte('date', ymd()).select('id,date').maybeSingle();
+    if (error) throw error;
+    if (!data) return res.status(404).json({ error: 'Site work entry not found (only today or future entries you added can be cancelled)' });
+    await logActivity('worker', req.worker.id, 'site_work_cancelled', req.worker.id, { date: data.date });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: errText(e) }); }
+});
+app.get('/api/admin/site-work-notifications', requireAdmin, async (req, res) => {
+  try {
+    const seen = await setting(SW_SEEN_PREFIX + req.session.admin.id, null);
+    const since = new Date(Date.now() - 14 * 86400000).toISOString();
+    const { data, error } = await db.from('attendance_marks').select('id,date,note,created_at,member_id,members(name,eid,dept)').eq('type', 'sitework').like('marked_by', 'worker:%').gte('created_at', since).order('created_at', { ascending: false }).limit(50);
+    if (error) throw error;
+    const items = (data || []).map(x => ({ id: x.id, date: x.date, note: x.note || '', createdAt: x.created_at, name: x.members?.name, eid: x.members?.eid, dept: x.members?.dept, unread: !seen || x.created_at > seen }));
+    res.json({ items, unreadCount: items.filter(i => i.unread).length });
+  } catch (e) { res.status(500).json({ error: errText(e) }); }
+});
+app.post('/api/admin/site-work-notifications/seen', requireAdmin, async (req, res) => {
+  try { await setSetting(SW_SEEN_PREFIX + req.session.admin.id, new Date().toISOString()); res.json({ ok: true }); }
+  catch (e) { res.status(500).json({ error: errText(e) }); }
 });
 
 app.get('/api/report/today', requireAdmin, async (req, res) => {
