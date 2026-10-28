@@ -112,7 +112,7 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 function dayDiff(a, b) { return Math.round((Date.parse(b + 'T00:00:00Z') - Date.parse(a + 'T00:00:00Z')) / 86400000); }
 function publicLeave(l) { return { id: l.id, fromDate: l.from_date, toDate: l.to_date, leaveType: l.leave_type || 'planned', reason: l.reason, status: l.status, createdAt: l.created_at, reviewedAt: l.reviewed_at }; }
 
-const MARK_LABEL = { absent: 'Absent', compoff: 'Comp-off', sitework: 'Site work' };
+const MARK_LABEL = { absent: 'Absent', compoff: 'Comp-off' };
 async function markOn(memberId, date) {
   try {
     const { data, error } = await db.from('attendance_marks').select('type').eq('member_id', memberId).eq('date', date).maybeSingle();
@@ -137,7 +137,6 @@ function isSunday(dateStr) { return new Date(dateStr + 'T00:00:00Z').getUTCDay()
 function dayStatus({ checkIn, mark, onLeave, date }) {
   if (checkIn) return 'Present';
   if (mark === 'compoff') return 'Comp-off';
-  if (mark === 'sitework') return 'Site work';
   if (mark === 'absent') return 'Absent';
   if (onLeave) return 'Leave';
   if (isSunday(date)) return 'Sunday off';
@@ -457,7 +456,7 @@ async function workerAttendance(req, res, type) {
     const date = ymd(), r = await getOneAttendance(req.worker.id, date);
     if (type === 'checkIn' && r?.check_in) return res.status(400).json({ error: 'Already checked in' });
     if (type === 'checkIn' && await approvedLeaveOn(req.worker.id, date)) return res.status(403).json({ error: ON_LEAVE_MSG });
-    if (type === 'checkIn') { const mk = await markOn(req.worker.id, date); if (mk && mk !== 'sitework') return res.status(403).json({ error: `You are marked ${MARK_LABEL[mk]} today. Contact your admin.` }); }
+    if (type === 'checkIn') { const mk = await markOn(req.worker.id, date); if (mk) return res.status(403).json({ error: `You are marked ${MARK_LABEL[mk]} today. Contact your admin.` }); }
     if (type === 'checkOut' && !r?.check_in) return res.status(400).json({ error: 'Check in first' });
     if (type === 'checkOut' && r?.check_out) return res.status(400).json({ error: 'Already checked out' });
     await setAttendance(req.worker.id, date, type, nowHM(), false); await logActivity('worker', req.worker.id, type === 'checkIn' ? 'worker_check_in' : 'worker_check_out', req.worker.id); res.json({ ok: true });
@@ -500,7 +499,7 @@ app.post('/api/attendance/:id/manual', requireWorker, async (req, res) => {
     const { data: m, error } = await db.from('members').select('*').eq('id', req.params.id).maybeSingle(); if (error) throw error;
     if (!m) return res.status(404).json({ error: 'Member not found' });
     if (await approvedLeaveOn(m.id, date)) return res.status(403).json({ error: ON_LEAVE_MSG });
-    { const mk = await markOn(m.id, date); if (mk && mk !== 'sitework') return res.status(403).json({ error: `You are marked ${MARK_LABEL[mk]} on this date. Contact your admin.` }); }
+    { const mk = await markOn(m.id, date); if (mk) return res.status(403).json({ error: `You are marked ${MARK_LABEL[mk]} on this date. Contact your admin.` }); }
     await setAttendance(m.id, date, type, time);
     await logActivity('worker', m.id, 'manual_attendance_edit', m.id, { type, date, time }); res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: errText(e) }); }
@@ -670,7 +669,7 @@ app.get('/api/admin/attendance-log', requireAdmin, async (req, res) => {
     marks.forEach(k => { markBy[k.member_id + '|' + k.date] = k; });
     leaves.forEach(l => { (leaveBy[l.member_id] = leaveBy[l.member_id] || []).push(l); });
     const rows = (members || []).map(m => {
-      const days = [], totals = { P: 0, A: 0, PL: 0, EL: 0, CO: 0, SW: 0, W: 0 };
+      const days = [], totals = { P: 0, A: 0, PL: 0, EL: 0, CO: 0, W: 0 };
       const since = m.created_at ? ymd(new Date(m.created_at)) : '0000-00-00'; // no auto-absent before the member was added
       for (let d = 1; d <= daysIn; d++) {
         const ds = month + '-' + String(d).padStart(2, '0'), dow = new Date(Date.UTC(y, mo - 1, d)).getUTCDay();
@@ -678,7 +677,7 @@ app.get('/api/admin/attendance-log', requireAdmin, async (req, res) => {
         const lv = (leaveBy[m.id] || []).find(l => l.from_date <= ds && l.to_date >= ds);
         let c = '';
         if (a?.check_in && a.counted !== false) c = 'P';
-        else if (mk) c = mk.type === 'absent' ? 'A' : mk.type === 'sitework' ? 'SW' : 'CO';
+        else if (mk) c = mk.type === 'absent' ? 'A' : 'CO';
         else if (lv) c = lv.leave_type === 'emergency' ? 'EL' : 'PL';
         else if (a?.check_in) c = 'W'; // worker's own entry still waiting for admin approval
         else if (ds < today && ds >= since && dow !== 0) c = 'A'; // no check-in on a past working day (Mon-Sat) = Absent automatically
@@ -705,7 +704,7 @@ app.post('/api/admin/marks', requireAdmin, async (req, res) => {
   try {
     const { memberId, date, type } = req.body, note = String(req.body.note || '').trim().slice(0, 200);
     const subType = type === 'absent' && ['public', 'annual'].includes(req.body.subType) ? req.body.subType : null;
-    if (!['absent', 'compoff', 'sitework'].includes(type)) return res.status(400).json({ error: 'Choose Absent, Comp-off or Site work' });
+    if (!['absent', 'compoff'].includes(type)) return res.status(400).json({ error: 'Choose Absent or Comp-off' });
     if (!DATE_RE.test(date || '')) return res.status(400).json({ error: 'Choose a valid date' });
     const { data: m, error: me } = await db.from('members').select('id').eq('id', memberId).maybeSingle();
     if (me) throw me;
@@ -716,7 +715,7 @@ app.post('/api/admin/marks', requireAdmin, async (req, res) => {
     let { error } = await db.from('attendance_marks').upsert({ ...row, sub_type: subType }, { onConflict: 'member_id,date' });
     if (error && /sub_type/i.test(error.message || '')) ({ error } = await db.from('attendance_marks').upsert(row, { onConflict: 'member_id,date' })); // migration not run yet
     if (error) throw error;
-    await logActivity('admin', req.session.admin.id, type === 'absent' ? 'marked_absent' : type === 'sitework' ? 'marked_sitework' : 'marked_compoff', memberId, { date });
+    await logActivity('admin', req.session.admin.id, type === 'absent' ? 'marked_absent' : 'marked_compoff', memberId, { date });
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: errText(e) }); }
 });
