@@ -500,7 +500,10 @@
         <button class="nav-link" data-view="leave">Leave<span class="nav-badge hidden" id="leaveBadge">0</span></button>
         <button class="nav-link" data-view="linkmember">Link Admin Member</button>
         <button class="nav-link hidden" data-view="myworker" id="myWorkerNavLink">My Worker Dashboard</button>
+<<<<<<< HEAD
         <button class="nav-link hidden" data-view="mainaccess" id="mainAccessNavLink">Main Admin Access</button>
+=======
+>>>>>>> origin/main
         <button class="nav-link hidden" data-view="requests" id="requestsNavLink">Requests<span class="nav-badge hidden" id="requestsBadge">0</span></button>
       </div>
     </div>
@@ -619,6 +622,7 @@
       <div class="worker-main" id="myWorkerMain" style="padding-top:0"></div>
     </div>
 
+<<<<<<< HEAD
     <div id="view-mainaccess" style="display:none;">
       <div class="page-head">
         <div><h1>Main admin access</h1><p>Password protected. Only the main admin can open this. Shows every member's check-in and check-out.</p></div>
@@ -626,6 +630,8 @@
       <div id="mainAccessBox"></div>
     </div>
 
+=======
+>>>>>>> origin/main
     <div id="view-requests" style="display:none;">
       <div class="page-head">
         <div><h1>Admin requests</h1><p>Accept or deny people who requested admin access.</p></div>
@@ -716,7 +722,10 @@ function enterAdminApp(){
   ['suConfirm','suName','suEmail'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   document.getElementById('userChip').innerHTML=`<div class="u-avatar" style="background:${colorFor(currentAdmin.id)}">${initials(currentAdmin.name)}</div><span class="u-name">${esc(currentAdmin.name.split(' ')[0])}</span>`;
   document.getElementById('requestsNavLink').classList.toggle('hidden',currentAdmin.role!=='super');
+<<<<<<< HEAD
   document.getElementById('mainAccessNavLink').classList.toggle('hidden',currentAdmin.role!=='super');mainUnlocked=false;
+=======
+>>>>>>> origin/main
   showScreen('appRoot');renderAdmin();refreshLink();
 }
 async function renderRequests(){
@@ -826,7 +835,11 @@ function openSettings(){
     <div class="field"><label>Current password <span style="font-weight:400">(required to save)</span></label><input type="password" id="stCur" autocomplete="current-password"></div>
     <div class="modal-actions"><button class="btn btn-outline" id="mCancel">Close</button><button class="btn btn-blue" id="stSave">Save changes</button></div>
     <div class="modal-section"><div class="section-title">All data</div><div class="section-sub">Browse and download everything stored in the system: attendance, members, leave, daily logs and Absent / Comp-off / Site work marks.</div><button class="btn btn-outline" id="stAllData">Open all data</button></div>
+<<<<<<< HEAD
     ${a.role==='super'?'<div class="modal-section"><div class="section-title">Sub admins <span id="stSubCount" style="font-weight:400"></span></div><div class="section-sub">Add up to 2 sub admins. They can manage attendance but cannot open Main Admin Access.</div><div id="stAdmins"><div class="empty" style="padding:12px">Loading…</div></div></div>':''}`);
+=======
+    ${a.role==='super'?'<div class="modal-section"><div class="section-title">Other admins</div><div class="section-sub">Change another admin\'s username or reset their password.</div><div id="stAdmins"><div class="empty" style="padding:12px">Loading…</div></div></div>':''}`);
+>>>>>>> origin/main
   document.getElementById('mCancel').onclick=closeModal;
   document.getElementById('stAllData').onclick=()=>openAllData('attendance');
   document.getElementById('stSave').onclick=async()=>{
@@ -844,6 +857,7 @@ function openSettings(){
 async function loadOtherAdmins(){
   const box=document.getElementById('stAdmins');if(!box)return;
   try{
+<<<<<<< HEAD
     const r=await api('/api/admin/admins');const list=(r.admins||[]).filter(x=>x.role!=='super');
     const cnt=document.getElementById('stSubCount');if(cnt)cnt.textContent='('+list.length+'/2)';
     box.innerHTML=(list.length?list.map(x=>`<div class="admin-row"><div><div class="m-name">${esc(x.name)}</div><div class="m-id">@${esc(x.username)}</div></div><div style="display:flex;gap:6px"><button class="btn btn-outline btn-sm" data-edit="${x.id}">Edit</button><button class="btn btn-outline btn-sm" data-rm="${x.id}" style="color:var(--red)">Remove</button></div></div>`).join(''):'<div class="empty" style="padding:12px">No sub admins yet.</div>')+(list.length<2?'<button class="btn btn-blue btn-sm" id="addSubBtn" style="margin-top:10px">+ Add sub admin</button>':'<div class="section-sub" style="margin-top:8px">Limit reached (2 of 2). Remove one to add another.</div>');
@@ -870,6 +884,13 @@ function openAddSubAdmin(){
     catch(e){modalErr(e.message);}
   };
 }
+=======
+    const r=await api('/api/admin/admins');const list=r.admins||[];
+    box.innerHTML=list.length?list.map(x=>`<div class="admin-row"><div><div class="m-name">${esc(x.name)}</div><div class="m-id">@${esc(x.username)}</div></div><button class="btn btn-outline btn-sm" data-id="${x.id}">Edit</button></div>`).join(''):'<div class="empty" style="padding:12px">No other admins yet.</div>';
+    box.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>openEditAdmin(list.find(x=>x.id===b.dataset.id)));
+  }catch(e){box.innerHTML=`<div class="empty" style="padding:12px">${esc(e.message)}</div>`;}
+}
+>>>>>>> origin/main
 function openEditAdmin(a){
   openModal(`<h2>Edit admin login</h2><div class="section-sub">${esc(a.name)}</div><div class="auth-error" id="modalError"></div>
     <div class="field"><label>Username</label><input type="text" id="eaUser" value="${esc(a.username)}" autocomplete="off"></div>
@@ -1109,6 +1130,7 @@ async function renderWorker(host){
 }
 
 
+<<<<<<< HEAD
 /* ---------- Main admin access (password gate + check-in / check-out list) ---------- */
 let mainUnlocked=false,maRows=[];
 function lockMain(){if(!mainUnlocked)return;mainUnlocked=false;api('/api/admin/main-access/lock',{method:'POST'}).catch(()=>{});}
@@ -1140,6 +1162,8 @@ async function loadMainLog(){
   catch(e){if(/password/i.test(e.message)){mainUnlocked=false;renderMainAccess();}else if(t)t.innerHTML=`<tbody><tr><td>${esc(e.message)}</td></tr></tbody>`;}
 }
 
+=======
+>>>>>>> origin/main
 /* ---------- Link admin member / My worker dashboard ---------- */
 let linkData=null;
 function applyLinkNav(){document.getElementById('myWorkerNavLink').classList.toggle('hidden',!(linkData&&linkData.linked));}
@@ -1150,12 +1174,19 @@ async function renderLinkMember(){
   await refreshLink();
   if(!linkData){list.innerHTML='<div class="empty">Could not load members. Try again.</div>';return;}
   const q=(document.getElementById('linkSearch').value||'').trim().toLowerCase(),L=linkData.linked;
+<<<<<<< HEAD
   cur.innerHTML=L?`<div class="card" style="padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><div class="section-sub" style="margin:0">Linked member</div><div class="m-name">${esc(L.name)} <span class="m-id" style="display:inline">· ${esc(L.eid)} · ${esc(L.dept)}</span></div></div><button class="btn btn-outline btn-sm" id="unlinkBtn">Remove</button></div>`:'';
   const doUnlink=async()=>{try{await api('/api/admin/link-member',{method:'DELETE'});if(document.querySelector('.nav-link.active')?.dataset.view==='myworker')document.querySelector('.nav-link[data-view="linkmember"]').click();showToast('Member removed');await renderLinkMember();}catch(e){showToast(e.message);}};
   if(L)document.getElementById('unlinkBtn').onclick=doUnlink;
   const rows=linkData.members.filter(m=>!q||(m.name+' '+m.eid+' '+m.dept).toLowerCase().includes(q));
   list.innerHTML=rows.length?rows.map(m=>{const mine=L&&L.id===m.id;return `<div class="member-row" style="grid-template-columns:1.8fr 1fr auto"><div class="m-who"><div class="m-avatar" style="background:${colorFor(m.id)}">${initials(m.name)}</div><div><div class="m-name">${esc(m.name)}</div><div class="m-id">${esc(m.eid)}</div></div></div><div class="m-dept">${esc(m.dept)}</div><div class="m-actions">${mine?'<span class="status-dot done"><span class="d"></span>Linked</span><button class="btn btn-outline btn-sm" data-unlink="1" style="color:var(--red)">Remove</button>':m.linkedToOther?'<span class="m-dept">Linked to another admin</span>':`<button class="btn btn-blue btn-sm" data-link="${m.id}">Select</button>`}</div></div>`;}).join(''):'<div class="empty">No members found.</div>';
   list.querySelectorAll('[data-unlink]').forEach(b=>b.onclick=doUnlink);
+=======
+  cur.innerHTML=L?`<div class="card" style="padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><div class="section-sub" style="margin:0">Linked member</div><div class="m-name">${esc(L.name)} <span class="m-id" style="display:inline">· ${esc(L.eid)} · ${esc(L.dept)}</span></div></div><button class="btn btn-outline btn-sm" id="unlinkBtn">Unlink</button></div>`:'';
+  if(L)document.getElementById('unlinkBtn').onclick=async()=>{try{await api('/api/admin/link-member',{method:'DELETE'});if(document.querySelector('.nav-link.active')?.dataset.view==='myworker')document.querySelector('.nav-link[data-view="linkmember"]').click();showToast('Member unlinked');await renderLinkMember();}catch(e){showToast(e.message);}};
+  const rows=linkData.members.filter(m=>!q||(m.name+' '+m.eid+' '+m.dept).toLowerCase().includes(q));
+  list.innerHTML=rows.length?rows.map(m=>{const mine=L&&L.id===m.id;return `<div class="member-row" style="grid-template-columns:1.8fr 1fr auto"><div class="m-who"><div class="m-avatar" style="background:${colorFor(m.id)}">${initials(m.name)}</div><div><div class="m-name">${esc(m.name)}</div><div class="m-id">${esc(m.eid)}</div></div></div><div class="m-dept">${esc(m.dept)}</div><div class="m-actions">${mine?'<span class="status-dot done"><span class="d"></span>Linked</span>':m.linkedToOther?'<span class="m-dept">Linked to another admin</span>':`<button class="btn btn-blue btn-sm" data-link="${m.id}">Select</button>`}</div></div>`;}).join(''):'<div class="empty">No members found.</div>';
+>>>>>>> origin/main
   list.querySelectorAll('[data-link]').forEach(b=>b.onclick=async()=>{try{await api('/api/admin/link-member',{method:'POST',body:JSON.stringify({memberId:b.dataset.link})});showToast('Linked. Open "My Worker Dashboard"');await renderLinkMember();}catch(e){showToast(e.message);}});
 }
 async function renderMyWorker(){
@@ -1175,7 +1206,11 @@ document.getElementById('adminLogoutBtn').onclick=logout;document.getElementById
 document.getElementById('addBtn').onclick=async()=>{const name=document.getElementById('newName').value.trim(),eid=document.getElementById('newEid').value.trim(),dept=document.getElementById('newDept').value.trim(),pin=document.getElementById('newPin').value.trim();if(!name||!eid||!/^\d{4}$/.test(pin)){showToast('Name, Worker ID and 4-digit PIN are required');return;}try{await addMember(name,eid,dept,pin);['newName','newEid','newDept','newPin'].forEach(id=>document.getElementById(id).value='');showToast(name+' added');}catch(e){showToast(e.message);}};
 document.getElementById('searchInput').oninput=renderMembers;document.getElementById('exportBtn').onclick=exportCSV;document.getElementById('activityExportBtn').onclick=exportActivityCSV;document.getElementById('attExportBtn').onclick=exportAttLogCSV;document.getElementById('attPrev').onclick=()=>renderAttLog(shiftMonth(attLogMonth||ymd(new Date()).slice(0,7),-1));document.getElementById('attNext').onclick=()=>renderAttLog(shiftMonth(attLogMonth||ymd(new Date()).slice(0,7),1));document.getElementById('attSearch').oninput=drawAttLog;
 document.getElementById('settingsBtn').onclick=openSettings;
+<<<<<<< HEAD
 document.querySelectorAll('.nav-link').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.nav-link').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const v=btn.dataset.view;['overview','report','activity','attlog','dailylog','leave','linkmember','myworker','requests','mainaccess'].forEach(x=>document.getElementById('view-'+x).style.display=x===v?'block':'none');if(v!=='myworker'){clearInterval(window._logPoll);currentWorker=null;}if(v==='activity')renderActivity();if(v==='attlog')renderAttLog();if(v==='dailylog')renderDailyLogs();if(v==='leave')renderLeaves();if(v==='requests')renderRequests();if(v==='linkmember')renderLinkMember();if(v==='myworker')renderMyWorker();if(v!=='mainaccess')lockMain();if(v==='mainaccess')renderMainAccess();});
+=======
+document.querySelectorAll('.nav-link').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.nav-link').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const v=btn.dataset.view;['overview','report','activity','attlog','dailylog','leave','linkmember','myworker','requests'].forEach(x=>document.getElementById('view-'+x).style.display=x===v?'block':'none');if(v!=='myworker'){clearInterval(window._logPoll);currentWorker=null;}if(v==='activity')renderActivity();if(v==='attlog')renderAttLog();if(v==='dailylog')renderDailyLogs();if(v==='leave')renderLeaves();if(v==='requests')renderRequests();if(v==='linkmember')renderLinkMember();if(v==='myworker')renderMyWorker();});
+>>>>>>> origin/main
 document.getElementById('resetUsername').onkeydown=e=>{if(e.key==='Enter')sendOtp()};document.getElementById('otpInput').onkeydown=e=>{if(e.key==='Enter')verifyOtp()};document.getElementById('resetConfirmPass').onkeydown=e=>{if(e.key==='Enter')saveNewPassword()};
 document.querySelectorAll('#adminAuthScreen input').forEach(i=>i.onkeydown=e=>{if(e.key==='Enter')handleAdminSubmit()});document.getElementById('workerPin').onkeydown=e=>{if(e.key==='Enter')handleWorkerSubmit()};document.getElementById('workerEid').onkeydown=e=>{if(e.key==='Enter')handleWorkerSubmit()};
 

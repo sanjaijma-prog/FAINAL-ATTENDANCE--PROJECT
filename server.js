@@ -233,10 +233,13 @@ app.get('/api/admin/requests', requireSuper, async (req, res) => {
   try { const { data, error } = await db.from('admins').select('*').eq('status', 'pending').order('created_at', { ascending: false }); if (error) throw error; res.json({ requests: (data || []).map(publicAdmin) }); }
   catch (e) { res.status(500).json({ error: errText(e) }); }
 });
-app.patch('/api/admin/requests/:id', requireSuper, async (req, res) => {
+app.('/api/admin/requests/:id', requireSuper, async (req, res) => {
   try {
     if (!['approved', 'denied'].includes(req.body.status)) return res.status(400).json({ error: 'Invalid status' });
+<<<<<<< HEAD
     if (req.body.status === 'approved' && (await subAdminCount()) >= MAX_SUB_ADMINS) return res.status(400).json({ error: `Only ${MAX_SUB_ADMINS} sub admins are allowed. Remove one in Settings first.` });
+=======
+>>>>>>> origin/main
     const { data, error } = await db.from('admins').update({ status: req.body.status }).eq('id', req.params.id).eq('status', 'pending').select('id').maybeSingle();
     if (error) throw error; if (!data) return res.status(404).json({ error: 'Request not found' });
     await logActivity('admin', req.session.admin.id, `admin_request_${req.body.status}`, null, { adminId: req.params.id });
@@ -381,6 +384,7 @@ app.patch('/api/admin/admins/:id', requireSuper, async (req, res) => {
   } catch (e) { res.status(500).json({ error: errText(e) }); }
 });
 
+<<<<<<< HEAD
 // ---------- Sub admins (max 2, added by the main admin in Settings) ----------
 const MAX_SUB_ADMINS = 2;
 async function subAdminCount() {
@@ -442,6 +446,8 @@ app.get('/api/admin/main-access/log', requireMainAccess, async (req, res) => {
   } catch (e) { res.status(500).json({ error: errText(e) }); }
 });
 
+=======
+>>>>>>> origin/main
 const workerLoginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20, skipSuccessfulRequests: true, standardHeaders: true, legacyHeaders: false, message: { error: 'Too many failed attempts. Please try again in 15 minutes.' } });
 app.post('/api/worker/auth', workerLoginLimiter, async (req, res) => {
   try {
